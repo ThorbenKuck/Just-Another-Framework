@@ -56,7 +56,7 @@ Function.applyDefaults(parser);
 // This will return an executable script
 Script script;
 try {
-  script = parser.parse(toEvaluateHarder);
+  script = parser.parse(toEvaluate);
 } catch (ParsingFailedException e) {
   e.printStackTrace();
   return;
