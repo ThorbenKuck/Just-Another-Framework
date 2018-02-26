@@ -16,13 +16,13 @@ public interface Function {
 		return new PrintLineFunction();
 	}
 
-	static Function isset() {
+	static Function require() {
 		return new RequireIsSetFunction();
 	}
 
 	static void applyDefaults(Parser parser) {
 		parser.addFunction(Function.convertToInt());
-		parser.addFunction(Function.isset());
+		parser.addFunction(Function.require());
 		parser.addFunction(Function.print());
 		parser.addFunction(Function.println());
 	}

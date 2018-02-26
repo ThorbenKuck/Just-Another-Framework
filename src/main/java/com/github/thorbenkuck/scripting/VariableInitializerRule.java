@@ -4,7 +4,6 @@ import java.util.function.Consumer;
 
 class VariableInitializerRule implements Rule {
 
-
 	@Override
 	public boolean applies(Line line) {
 		return line.matches("var [a-zA-Z0-9]+.*");
@@ -14,6 +13,10 @@ class VariableInitializerRule implements Rule {
 	public Consumer<Register> apply(Line line, Parser parser, int linePointer) {
 		StringBuilder stringBuilder = new StringBuilder(line.toString());
 		String name = parseVariableName(stringBuilder);
+		if(!parser.getInternalVariable(name).equals(Register.NULL_VALUE)) {
+			parser.error("double definition of variable " + name, linePointer);
+		}
+		parser.setInternalVariable(name, "undefined");
 		line.remove(0, 3);
 		return new Consumer<Register>() {
 			@Override
