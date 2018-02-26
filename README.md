@@ -36,7 +36,7 @@ A "simple" Example:
 //print(..)       prints something
 //println(..)     prints something followed by a new line
 //require($)      throws an exception, if variable($) is not set
-//convertToInt($) checks if variable($) is an int in java
+//convertToInt($) sets variable($) to 0, if it is not an int in java
 //loop $ x:y      loops from x to y, increasing variable($)
 //++$             increments a variable($)
 //var $           sets an variable($)
