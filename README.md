@@ -28,7 +28,18 @@ A "simple" Example:
 
 // The Script we want to evaluate.
 // Since this is only one line, we have to put ; as a crlf
-// The intends are optional
+// The intends are optional.
+// Every function and rule is supported by this framework
+// This is the best i could come up with.. sorry for 
+// possible confusions.. Let me explain those functions:
+
+//print(..)       prints something
+//println(..)     prints something followed by a new line
+//require($)      throws an exception, if variable($) is not set
+//convertToInt($) checks if variable($) is an int in java
+//loop $ x:y      loops from x to y, increasing variable($)
+//++$             increments a variable($)
+//var $           sets an variable($)
 String toEvaluate =
   "println(\"DEMO-SCRIPT!\");" +
   "require(x);" +
