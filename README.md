@@ -6,9 +6,23 @@ A "simple" foundation to creating your own scripting Language.
 
 This Framwork ist still in production! Use at your own Risk!
 
+------ 
+
+## Integration
+
+### Maven
+
+NOT YET AVAILABLE
+
+### Gradle
+
+NOT YET AVAILABLE
+
 ------
 
-A simple Example:
+## Example
+
+A "simple" Example:
 
 ```java
 
@@ -81,7 +95,8 @@ script.setValue("x", "10");
 
 // Now we run our Script. This may throw an
 // ExecutionFailedException if anything
-// goes wrong as we run it.
+// goes wrong as we run it. Should not
+// happen here tho
 try {
   script.run();
 } catch (ExecutionFailedException e) {
