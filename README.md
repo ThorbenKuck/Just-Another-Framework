@@ -4,9 +4,17 @@ A "simple" foundation to creating your own scripting Language.
 
 # !WARNING!
 
-This Framwork ist still in production! Use at your own Risk!
+This Framework ist still in production! Use at your own Risk!
+
+This Framework also is NOT optimized! There is still some quirky Code inside! Do NOT judge the Framework by its current State!
 
 ------ 
+
+## Version
+
+Current Version: 0 (i mean it! Use at your own risk!)
+
+------
 
 ## Integration
 
