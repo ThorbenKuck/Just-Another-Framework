@@ -1,0 +1,50 @@
+package com.github.thorbenkuck.scripting;
+
+import java.util.function.Consumer;
+
+class VariableInitializerRule implements Rule {
+
+
+	@Override
+	public boolean applies(Line line) {
+		return line.matches("var [a-zA-Z0-9]+.*");
+	}
+
+	@Override
+	public Consumer<Register> apply(Line line, Parser parser, int linePointer) {
+		StringBuilder stringBuilder = new StringBuilder(line.toString());
+		String name = parseVariableName(stringBuilder);
+		line.remove(0, 3);
+		return new Consumer<Register>() {
+			@Override
+			public void accept(Register register) {
+				if(Register.NULL_VALUE.equals(register.get(name))) {
+					register.put(name, "undefined");
+				} else {
+					parser.error(name + " is already defined!", line.getLineNumber());
+				}
+			}
+
+			@Override
+			public String toString() {
+				return "InitializeVariable(" + name + ")";
+			}
+		};
+	}
+
+	private String parseVariableName(StringBuilder line) {
+		if (!(line.indexOf("var ") == 0)) {
+			return "null";
+		}
+
+		line.delete(0, "var ".length());
+
+		String lineString = line.toString();
+
+		String name = line.substring(0, lineString.contains(" ") ? lineString.indexOf(" ") : lineString.length());
+		line.delete(0, name.length());
+
+		return name;
+	}
+
+}

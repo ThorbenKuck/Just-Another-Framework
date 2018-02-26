@@ -1,25 +1,59 @@
 package com.github.thorbenkuck.scripting;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import com.github.thorbenkuck.scripting.exceptions.ExecutionFailedException;
+
+import java.util.*;
 import java.util.function.Consumer;
 
 public class Script {
 
 	private final Queue<Consumer<Register>> toRun = new LinkedList<>();
-	private final Register register = new Register();
+	private final Map<String, String> initialRegisterValues = new HashMap<>();
+
+	Script() {
+		this(new LinkedList<>());
+	}
 
 	Script(Queue<Consumer<Register>> core) {
 		this.toRun.addAll(core);
 	}
 
-	public void run() {
+	void setConsumer(Collection<Consumer<Register>> consumer) {
+		this.toRun.addAll(consumer);
+	}
+
+	public void run(Map<String, String> registerValues) throws ExecutionFailedException {
+		synchronized (initialRegisterValues) {
+			initialRegisterValues.putAll(registerValues);
+		}
+		run();
+	}
+
+	public void run() throws ExecutionFailedException {
+		final Register register = new Register();
+		synchronized (initialRegisterValues) {
+			register.adapt(initialRegisterValues);
+		}
 		Queue<Consumer<Register>> copy = new LinkedList<>(toRun);
 
-		while(copy.peek() != null) {
-			copy.poll().accept(register);
+		try {
+			while(copy.peek() != null) {
+				Consumer<Register> consumer = copy.poll();
+				consumer.accept(register);
+			}
+		} catch (Exception e) {
+			throw new ExecutionFailedException(e);
+		} finally {
+			register.clear();
 		}
+	}
 
-		register.clear();
+	@Override
+	public String toString() {
+		return toRun.toString();
+	}
+
+	public void setValue(String key, String value) {
+		initialRegisterValues.put(key, value);
 	}
 }

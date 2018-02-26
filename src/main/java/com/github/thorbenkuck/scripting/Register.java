@@ -6,13 +6,17 @@ import java.util.Map;
 public class Register {
 
 	private final Map<String, String> core = new HashMap<>();
+	public static final String NULL_VALUE = "null";
 
 	public void put(String key, String value) {
 		core.put(key, value);
 	}
 
 	public String get(String key) {
-		return core.getOrDefault(key, "null");
+		if(Utility.isInteger(key)) {
+			return key;
+		}
+		return core.getOrDefault(key, NULL_VALUE);
 	}
 
 	public void remove(String name) {
@@ -21,5 +25,14 @@ public class Register {
 
 	public void clear() {
 		core.clear();
+	}
+
+	@Override
+	public String toString() {
+		return core.toString();
+	}
+
+	public void adapt(Map<String, String> initialRegisterValues) {
+		core.putAll(initialRegisterValues);
 	}
 }
