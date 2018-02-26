@@ -13,32 +13,31 @@ A simple Example:
 ```java
 
 // The Script we want to evaluate.
-// Since this is only one line, we have to put ; as a crft
+// Since this is only one line, we have to put ; as a crlf
 // The intends are optional
 String toEvaluate =
-			"println(\"DEMO-SCRIPT!\");" +
-			"require(x);" +
-			"convertToInt(x);" +
-			"var y = x;" +
-			"require(y);" +
-			"loop i 1:5;" +
-			"    print(i);" +
-			"    print(\"=\");" +
-			"    println(y);" +
-			"    loop j 1:3;" +
-			"        ++y;" +
-			"    endLoop j;" +
-			"endLoop i;" +
-			"print(\"x should still be what you selected: \");" +
-			"println(x);" +
-			"print(\"i=\");" +
-			"println(i);" +
-			"print(\"j=\");" +
-			"println(j);" +
-			"var z;" +
-			"var z;" +
-			"print(\"z=\");println(z);" +
-			"println(\"END\");";
+  "println(\"DEMO-SCRIPT!\");" +
+  "require(x);" +
+  "convertToInt(x);" +
+  "var y = x;" +
+  "require(y);" +
+  "loop i 1:5;" +
+  "    print(i);" +
+  "    print(\"=\");" +
+  "    println(y);" +
+  "    loop j 1:3;" +
+  "        ++y;" +
+  "    endLoop j;" +
+  "endLoop i;" +
+  "print(\"x should still be what you selected: \");" +
+  "println(x);" +
+  "print(\"i=\");" +
+  "println(i);" +
+  "print(\"j=\");" +
+  "println(j);" +
+  "var z;" +
+  "print(\"z=\");println(z);" +
+  "println(\"END\");";
 
 // Creates a new Parser.
 // Every Parser is unique and
@@ -57,10 +56,10 @@ Function.applyDefaults(parser);
 // This will return an executable script
 Script script;
 try {
-	script = parser.parse(toEvaluateHarder);
+  script = parser.parse(toEvaluateHarder);
 } catch (ParsingFailedException e) {
-	e.printStackTrace();
-	return;
+  e.printStackTrace();
+  return;
 }
 
 System.out.println("script parsed!");
@@ -75,9 +74,8 @@ System.out.println();
 // call Script#run by providing
 // a Map<String, String> which
 // maps variable names to its values.
-// 
 // In Script-World, we are only know
-// String. We may however convert those
+// Strings. We may however convert those
 // to Objects as we execute our java-code
 script.setValue("x", "10");
 
@@ -87,6 +85,6 @@ script.setValue("x", "10");
 try {
   script.run();
 } catch (ExecutionFailedException e) {
-	e.printStackTrace(System.out);
+  e.printStackTrace(System.out);
 }
 ```
