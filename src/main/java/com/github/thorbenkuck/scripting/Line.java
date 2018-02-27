@@ -1,6 +1,8 @@
 package com.github.thorbenkuck.scripting;
 
-public class Line {
+import java.util.*;
+
+public class Line implements Iterable<Character> {
 
 	private String content;
 	private final int lineNumber;
@@ -114,5 +116,73 @@ public class Line {
 
 	public boolean endsWith(String s) {
 		return content.endsWith(s);
+	}
+
+	public void removeLast() {
+		remove(content.length() - 1);
+	}
+
+	public int countCharInLine(char toCount) {
+		int count = 0;
+		for (int i=0; i < content.length(); i++) {
+			if (content.charAt(i) == toCount) {
+				count++;
+			}
+		}
+		return count;
+	}
+
+	/**
+	 * Returns an iterator over elements of type {@code T}.
+	 *
+	 * @return an Iterator.
+	 */
+	@Override
+	public Iterator<Character> iterator() {
+		return new CharacterIterator(content.toCharArray());
+	}
+
+	private class CharacterIterator implements Iterator<Character> {
+
+		private final Queue<Character> elements;
+		private Character current;
+
+		private CharacterIterator(final Collection<Character> elements) {
+			this.elements = new LinkedList<>(elements);
+		}
+
+		private CharacterIterator(final char[] elements) {
+			final List<Character> ourList = new ArrayList<>();
+
+			for(char currentChar : elements) {
+				ourList.add(currentChar);
+			}
+
+			this.elements = new LinkedList<>(ourList);
+		}
+
+		/**
+		 * Returns {@code true} if the iteration has more elements.
+		 * (In other words, returns {@code true} if {@link #next} would
+		 * return an element rather than throwing an exception.)
+		 *
+		 * @return {@code true} if the iteration has more elements
+		 */
+		@Override
+		public boolean hasNext() {
+			return elements.peek() != null;
+		}
+
+		/**
+		 * Returns the next element in the iteration.
+		 *
+		 * @return the next element in the iteration
+		 * @throws NoSuchElementException if the iteration has no more elements
+		 */
+		@Override
+		public Character next() {
+			current = elements.poll();
+			return current;
+		}
 	}
 }

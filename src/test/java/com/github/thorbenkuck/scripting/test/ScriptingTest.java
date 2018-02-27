@@ -5,14 +5,17 @@ import com.github.thorbenkuck.scripting.exceptions.ExecutionFailedException;
 import com.github.thorbenkuck.scripting.exceptions.ParsingFailedException;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public class ScriptingTest {
 
-	private static String toEvaluate = "println(get(x))";
+	private static String toEvaluate = "println(add(add(add(add(x), x), add(x), add(x)), add(x), x));" +
+			"println(get(x))";
 
 	private static String toEvaluateHarder =
 			"println(\"DEMO-SCRIPT!\");" +
 					"require(x);" +
+					"println(arr[ab]);" +
 					"convertToInt(x);" +
 					"var y = x;" +
 					"require(y);" +
@@ -39,10 +42,10 @@ public class ScriptingTest {
 	public static void main(String[] args) {
 		Parser parser = Parser.create();
 
+		parser.addFunction(new ExampleFunction());
 		Rule.applyDefaults(parser);
 		Function.applyDefaults(parser);
 
-		parser.addFunction(new ExampleFunction());
 
 		System.out.println("parsing executable script ..");
 		Script script;
@@ -87,24 +90,43 @@ public class ScriptingTest {
 	private static class ExampleFunction implements Function {
 		@Override
 		public String getFunctionName() {
-			return "get";
+			return "add";
 		}
 
 		@Override
 		public String calculate(String[] args, Register register) {
+			int count = 0;
+
 			if (args.length > 0) {
 				Queue<String> leftOver = new LinkedList<>(Arrays.asList(args));
 				StringBuilder result = new StringBuilder();
 				while (leftOver.peek() != null) {
 					String arg = leftOver.poll();
-					result.append(register.get(arg));
+					String value;
+					if(isVariable.apply(arg)) {
+						value = register.get(arg);
+					} else {
+						value = arg;
+					}
+					result.append(value);
+					if(Utility.isInteger(value)) {
+						count += Integer.parseInt(value);
+					} else {
+						count += 0;
+					}
 					if (leftOver.peek() != null) {
 						result.append(" AND ");
 					}
 				}
-				return result.toString();
+				if(args.length > 1) {
+					result.append(" = ").append(count);
+				}
+				System.out.println(result.toString());
+
+				return Integer.toString(count);
 			}
-			return asStringValue.apply("blablabla");
+
+			return String.valueOf(count);
 		}
 	}
 }

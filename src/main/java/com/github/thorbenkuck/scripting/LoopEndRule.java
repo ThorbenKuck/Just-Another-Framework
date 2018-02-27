@@ -21,7 +21,7 @@ class LoopEndRule implements Rule {
 
 	@Override
 	public boolean applies(Line line) {
-		return line.matches("endLoop [a-zA-Z0-9]+");
+		return line.matches("endLoop[ ][a-zA-Z0-9]+");
 	}
 
 }

@@ -2,7 +2,7 @@ package com.github.thorbenkuck.scripting;
 
 import java.util.function.Consumer;
 
-public class DeleteRule implements Rule {
+class DeleteRule implements Rule {
 	@Override
 	public boolean applies(Line line) {
 		return line.matches("delete[ ]+[a-zA-Z0-9]+");

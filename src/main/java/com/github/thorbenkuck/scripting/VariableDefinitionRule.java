@@ -51,5 +51,4 @@ class VariableDefinitionRule implements Rule {
 
 		return name;
 	}
-
 }
