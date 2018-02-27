@@ -10,4 +10,6 @@ public interface Script {
 	void run() throws ExecutionFailedException;
 
 	void setValue(String key, String value);
+
+	int countInstructions();
 }

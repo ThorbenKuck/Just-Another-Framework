@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 class ScriptImpl implements Script {
 
-	private final Queue<Consumer<Register>> toRun = new LinkedList<>();
+	private final Queue<Consumer<Register>> core = new LinkedList<>();
 	private final Map<String, String> initialRegisterValues = new HashMap<>();
 
 	ScriptImpl() {
@@ -15,11 +15,14 @@ class ScriptImpl implements Script {
 	}
 
 	ScriptImpl(Queue<Consumer<Register>> core) {
-		this.toRun.addAll(core);
+		this.core.addAll(core);
 	}
 
 	void setConsumer(Collection<Consumer<Register>> consumer) {
-		this.toRun.addAll(consumer);
+		synchronized (core) {
+			core.clear();
+			core.addAll(consumer);
+		}
 	}
 
 	@Override
@@ -36,11 +39,14 @@ class ScriptImpl implements Script {
 		synchronized (initialRegisterValues) {
 			register.adapt(initialRegisterValues);
 		}
-		Queue<Consumer<Register>> copy = new LinkedList<>(toRun);
+		Queue<Consumer<Register>> consumerCopy;
+		synchronized (core) {
+			consumerCopy = new LinkedList<>(core);
+		}
 
 		try {
-			while(copy.peek() != null) {
-				Consumer<Register> consumer = copy.poll();
+			while(consumerCopy.peek() != null) {
+				Consumer<Register> consumer = consumerCopy.poll();
 				consumer.accept(register);
 			}
 		} catch (Exception e) {
@@ -54,7 +60,13 @@ class ScriptImpl implements Script {
 	public String toString() {
 		int lineCounter = 0;
 		StringBuilder result = new StringBuilder("------ SCRIPT_START" + System.lineSeparator());
-		for(Consumer<Register> consumer : toRun) {
+
+		final List<Consumer<Register>> consumerCopy;
+		synchronized (core) {
+			consumerCopy = new ArrayList<>(core);
+		}
+
+		for(Consumer<Register> consumer : consumerCopy) {
 			result.append("(").append(lineCounter++).append("): ").append(consumer).append(System.lineSeparator());
 		}
 		result.append("------ SCRIPT_END");
@@ -64,5 +76,12 @@ class ScriptImpl implements Script {
 	@Override
 	public void setValue(String key, String value) {
 		initialRegisterValues.put(key, value);
+	}
+
+	@Override
+	public int countInstructions() {
+		synchronized (core) {
+			return core.size();
+		}
 	}
 }

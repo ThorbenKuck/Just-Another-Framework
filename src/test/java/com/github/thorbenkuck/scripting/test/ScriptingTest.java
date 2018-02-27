@@ -31,7 +31,8 @@ public class ScriptingTest {
 					"print(\"j=\");" +
 					"println(j);" +
 					"var z;" +
-					"var z;" +
+					"print(\"z=\");println(z);" +
+					"delete z;" +
 					"print(\"z=\");println(z);" +
 					"println(\"END\");";
 

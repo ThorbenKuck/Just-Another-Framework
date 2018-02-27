@@ -24,11 +24,16 @@ public interface Rule {
 		return new IntegerIncrementRule();
 	}
 
+	static Rule delete() {
+		return new DeleteRule();
+	}
+
 	static void applyDefaults(Parser parser) {
 		parser.addRule(Rule.variableInitializer());
 		parser.addRule(Rule.variableDefinition());
 		parser.addRule(Rule.loopStart());
 		parser.addRule(Rule.loopEnd());
+		parser.addRule(Rule.delete());
 		parser.addRule(Rule.incrementInteger());
 	}
 

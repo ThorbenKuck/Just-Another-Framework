@@ -5,12 +5,16 @@ import com.github.thorbenkuck.scripting.exceptions.ParsingFailedException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 class ParserImpl implements Parser {
 
 	private final List<Rule> rules = new ArrayList<>();
 	private final Map<String, Function> functions = new HashMap<>();
+	private final Lock functionsLock = new ReentrantLock(true);
+	private final Lock ruleLock = new ReentrantLock(true);
 	private final Register internalVariables = new Register();
 	// TODO: vlt mit strategyPattern dynamisch austauschbar machen
 	private final String lineEnd = ";";
@@ -20,43 +24,57 @@ class ParserImpl implements Parser {
 	private static int currentFunctionCount = 0;
 	private String errorMessage;
 
+	private int getNextFunctionCount() {
+		synchronized (this) {
+			return currentFunctionCount++;
+		}
+	}
+
 	@Override
 	public synchronized Script parse(String string) throws ParsingFailedException {
 		running.set(true);
-		linePointer.set(0);
 		List<Line> lines = parseLines(string);
-		ScriptImpl result = new ScriptImpl(created);
 
-		for (int currentLine = 0; currentLine < lines.size(); ) {
-			if (!running.get()) {
-				throw new ParsingFailedException("Stopped while parsing Script!\n" + errorMessage + "\n> (" + linePointer.get() + "): " + lines.get(linePointer.get()));
-			}
-			Line line = lines.get(currentLine).duplicate();
-			boolean workedOn = true;
-			while (!line.isEmpty() && workedOn) {
-				try {
-					if (containsFunction(line.toString())) {
-						applyFunction(line);
-						workedOn = true;
-					} else if (applyRule(line, created)) {
-						workedOn = false;
-					} else {
-						workedOn = false;
-					}
-				} catch (Exception e) {
-					throw new ParsingFailedException("Encountered Exception while parsing!", e);
+		try {
+			functionsLock.lock();
+			ruleLock.unlock();
+			for (int currentLine = 0; currentLine < lines.size(); ) {
+				if (!running.get()) {
+					throw new ParsingFailedException("Stopped while parsing Script!\n" + errorMessage + "\n> (" + linePointer.get() + "): " + lines.get(linePointer.get()));
 				}
+				Line line = lines.get(currentLine).duplicate();
+				boolean workedOn = true;
+				while (!line.isEmpty() && workedOn) {
+					try {
+						if (containsFunction(line.toString())) {
+							applyFunction(line);
+							workedOn = true;
+						} else if (applyRule(line, created)) {
+							workedOn = false;
+						} else {
+							workedOn = false;
+						}
+					} catch (Exception e) {
+						throw new ParsingFailedException("Encountered Exception while parsing!", e);
+					}
+				}
+				currentLine = linePointer.incrementAndGet();
 			}
-			currentLine = linePointer.incrementAndGet();
+		} finally {
+			functionsLock.unlock();
+			ruleLock.unlock();
+			ScriptImpl result;
+			synchronized (this) {
+				internalVariables.clear();
+				result = new ScriptImpl(created);
+				created.clear();
+				currentFunctionCount = 0;
+				linePointer.set(0);
+			}
+			running.set(false);
+
+			return result;
 		}
-
-		internalVariables.clear();
-		result.setConsumer(created);
-		created.clear();
-		currentFunctionCount = 0;
-		running.set(false);
-
-		return result;
 	}
 
 	private boolean applyRule(final Line line, final Queue<Consumer<Register>> created) {
@@ -129,7 +147,7 @@ class ParserImpl implements Parser {
 			return "void";
 		}
 		function.onParse(args, this, lineNumber);
-		String registerAddress = "F#" + functionName + currentFunctionCount++;
+		String registerAddress = "F#" + functionName + getNextFunctionCount();
 
 		created.add(new Consumer<Register>() {
 
@@ -225,7 +243,12 @@ class ParserImpl implements Parser {
 
 	@Override
 	public void addRule(Rule rule) {
-		this.rules.add(rule);
+		try {
+			ruleLock.lock();
+			this.rules.add(rule);
+		} finally {
+			ruleLock.unlock();
+		}
 	}
 
 	@Override
@@ -252,7 +275,12 @@ class ParserImpl implements Parser {
 
 	@Override
 	public void addFunction(Function function) {
-		functions.put(function.getFunctionName(), function);
+		try {
+			functionsLock.lock();
+			functions.put(function.getFunctionName(), function);
+		} finally {
+			functionsLock.unlock();
+		}
 	}
 
 	@Override

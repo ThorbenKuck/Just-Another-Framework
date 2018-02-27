@@ -49,7 +49,7 @@ class LoopStartRule implements Rule {
 
 					@Override
 					public String toString() {
-						return "Increase Loop-Count";
+						return "Increase Loop-Count(" + name + ")";
 					}
 				};
 			}
