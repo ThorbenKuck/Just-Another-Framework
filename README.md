@@ -132,35 +132,34 @@ If you want to create a custom Function, you may override the <code>Function</co
 ```java
 public class AddFunction implements Function {
     @Override
-		public String getFunctionName() {
-			return "add";
-		}
+    public String getFunctionName() {
+        return "add";
+    }
 
-		@Override
-		public String calculate(String[] args, Register register) {
-			int count = 0;
+    @Override
+    public String calculate(String[] args, Register register) {
+        int count = 0;
 
-			if (args.length > 0) {
-				Queue<String> leftOver = new LinkedList<>(Arrays.asList(args));
-				while (leftOver.peek() != null) {
-					String arg = leftOver.poll();
-					String value;
-					if(isVariable.apply(arg)) {
-						value = register.get(arg);
-					} else {
-						value = arg;
-					}
-					result.append(value);
-					if(Utility.isInteger(value)) {
-						count += Integer.parseInt(value);
-					} else {
-						count += 0;
-					}
-				}
-			}
-
-			return String.valueOf(count);
-		}
+        if (args.length > 0) {
+            Queue<String> leftOver = new LinkedList<>(Arrays.asList(args));
+            while (leftOver.peek() != null) {
+                String arg = leftOver.poll();
+	        String value;
+                if(isVariable.apply(arg)) {
+                    value = register.get(arg);
+                } else {
+                   value = arg;
+                }
+        	    result.append(value);
+                if(Utility.isInteger(value)) {
+                    count += Integer.parseInt(value);
+                } else {
+                    count += 0;
+                }
+            }
+        }
+        return String.valueOf(count);
+    }
 }
 ```
 
