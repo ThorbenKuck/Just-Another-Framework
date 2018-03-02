@@ -12,7 +12,7 @@ This Framework also is NOT optimized! There is still some quirky Code inside! Do
 
 ## Version
 
-Current Version: 0 (i mean it! Use at your own risk!)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.thorbenkuck/NetCom2/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.thorbenkuck/NetCom2)   
 
 ------
 
@@ -20,11 +20,23 @@ Current Version: 0 (i mean it! Use at your own risk!)
 
 ### Maven
 
-NOT YET AVAILABLE
+Just add this dependency to your pom.xml
+
+```
+<dependency>
+    <groupId>com.github.thorbenkuck</groupId>
+    <artifactId>Scripting</artifactId>
+    <version>0.2</version>
+</dependency>
+```
 
 ### Gradle
 
-NOT YET AVAILABLE
+Just add this dependency to your dependency part in build.gradle
+
+```
+compile group: 'com.github.thorbenkuck', name: 'Scripting', version: '0.2'
+```
 
 ------
 
