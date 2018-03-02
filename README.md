@@ -33,92 +33,105 @@ NOT YET AVAILABLE
 A "simple" Example:
 
 ```java
-
-// The Script we want to evaluate.
-// Since this is only one line, we have to put ; as a crlf
-// The intends are optional.
-// Every function and rule is supported by this framework
-// This is the best i could come up with.. sorry for 
-// possible confusions.. Let me explain those functions:
-
-//print(..)       prints something
-//println(..)     prints something followed by a new line
-//require($)      throws an exception, if variable($) is not set
-//convertToInt($) sets variable($) to 0, if it is not an int in java
-//loop $ x:y      loops from x to y, increasing variable($)
-//++$             increments a variable($)
-//var $           sets an variable($)
-String toEvaluate =
-  "println(\"DEMO-SCRIPT!\");" +
-  "require(x);" +
-  "convertToInt(x);" +
-  "var y = x;" +
-  "require(y);" +
-  "loop i 1:5;" +
-  "    print(i);" +
-  "    print(\"=\");" +
-  "    println(y);" +
-  "    loop j 1:3;" +
-  "        ++y;" +
-  "    endLoop j;" +
-  "endLoop i;" +
-  "print(\"x should still be what you selected: \");" +
-  "println(x);" +
-  "print(\"i=\");" +
-  "println(i);" +
-  "print(\"j=\");" +
-  "println(j);" +
-  "var z;" +
-  "print(\"z=\");println(z);" +
-  "println(\"END\");";
-
-// Creates a new Parser.
-// Every Parser is unique and
-// maintains its own set of rules
-// and functions.
-Parser parser = Parser.create();
-
-// Hook up all your rules and functions
-// Here, we use the provided ones and
-// simply apply all default Rules
-// and Functions
-Rule.applyDefaults(parser);
-Function.applyDefaults(parser);
-
-// Parse the Script.
-// This will return an executable script
-Script script;
-try {
-  script = parser.parse(toEvaluate);
-} catch (ParsingFailedException e) {
-  e.printStackTrace();
-  return;
-}
-
-System.out.println("script parsed!");
-
-System.out.println();
-// Prints every step the script is going to take
-System.out.println(script);
-System.out.println();
-
-// Inject "outside" variables.
-// You can also set them, once you
-// call Script#run by providing
-// a Map<String, String> which
-// maps variable names to its values.
-// In Script-World, we are only know
-// Strings. We may however convert those
-// to Objects as we execute our java-code
-script.setValue("x", "10");
-
-// Now we run our Script. This may throw an
-// ExecutionFailedException if anything
-// goes wrong as we run it. Should not
-// happen here tho
-try {
-  script.run();
-} catch (ExecutionFailedException e) {
-  e.printStackTrace(System.out);
+public class Example {
+	public void run() {
+        // The Script we want to evaluate.
+        // Since this is only one line, we have to put ; as a crlf
+        // The intends are optional.
+        // Every function and rule is supported by this framework
+        // This is the best i could come up with.. sorry for 
+        // possible confusions.. Let me explain those functions:
+        
+        //print(..)       prints something
+        //println(..)     prints something followed by a new line
+        //require($)      throws an exception, if variable($) is not set
+        //convertToInt($) sets variable($) to 0, if it is not an int in java
+        //loop $ x:y      loops from x to y, increasing variable($)
+        //++$             increments a variable($)
+        //var $           marks an variable as usable($)
+        //$ = %           sets the usable variable $ to %
+        String toEvaluate =
+          "println(\"DEMO-SCRIPT!\");" +
+          "require(x);" +
+          "convertToInt(x);" +
+          "var y = x;" +
+          "require(y);" +
+          "loop i 1:5;" +
+          "    print(i);" +
+          "    print(\"=\");" +
+          "    println(y);" +
+          "    loop j 1:3;" +
+          "        ++y;" +
+          "    endLoop j;" +
+          "endLoop i;" +
+          "print(\"x should still be what you selected: \");" +
+          "println(x);" +
+          "print(\"i=\");" +
+          "println(i);" +
+          "print(\"j=\");" +
+          "println(j);" +
+          "var z;" +
+          "print(\"z=\");println(z);" +
+          "println(\"END\");";
+        
+        // Creates a new Parser.
+        // Every Parser is unique and
+        // maintains its own set of rules
+        // and functions.
+        Parser parser = Parser.create();
+        
+        // Hook up all your rules and functions
+        // Here, we use the provided ones and
+        // simply apply all default Rules
+        // and Functions
+        
+        Package foundation = PackageBuilder.get()
+                .add(IOModule.getPackage())
+                .add(SystemModule.getPackage())
+                .add(MathModule.getPackage())
+                .create();
+        
+        parser.add(foundation);
+        
+        // Parse the Script.
+        // This will return an executable script
+        Script script;
+        try {
+          script = parser.parse(toEvaluate);
+        } catch (ParsingFailedException e) {
+          e.printStackTrace();
+          return;
+        }
+        
+        System.out.println("script parsed!");
+        
+        // Prints every step the script is going to take
+        // If the Output is to much for you, simply delte
+        // this following 3 lines.
+        System.out.println();
+        System.out.println(script);
+        System.out.println();
+        
+        // Inject "outside" variables.
+        // You can also set them, once you
+        // call Script#run by providing
+        // a Map<String, String> which
+        // maps variable names to its values.
+        // In Script-World, we are only know
+        // Strings, which we might convert
+        // to Objects as we execute our java-code
+        script.setValue("x", "10");
+        
+        // Now we run our Script. This may throw an
+        // ExecutionFailedException if anything
+        // goes wrong as we run it. Should not
+        // happen here tho
+        try {
+          script.run();
+        } catch (ExecutionFailedException e) {
+          e.printStackTrace(System.out);
+        }
+        
+    }
 }
 ```

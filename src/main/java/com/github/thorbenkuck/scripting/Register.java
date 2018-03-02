@@ -1,38 +1,22 @@
 package com.github.thorbenkuck.scripting;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public class Register {
+public interface Register {
 
-	private final Map<String, String> core = new HashMap<>();
-	public static final String NULL_VALUE = "null";
-
-	public void put(String key, String value) {
-		core.put(key, value);
+	static Register create() {
+		return new MappingRegister();
 	}
 
-	public String get(String key) {
-		if(Utility.isInteger(key)) {
-			return key;
-		}
-		return core.getOrDefault(key, NULL_VALUE);
-	}
+	String NULL_VALUE = "null";
 
-	public void remove(String name) {
-		core.remove(name);
-	}
+	void put(String key, String value);
 
-	public void clear() {
-		core.clear();
-	}
+	String get(String key);
 
-	@Override
-	public String toString() {
-		return core.toString();
-	}
+	void remove(String name);
 
-	public void adapt(Map<String, String> initialRegisterValues) {
-		core.putAll(initialRegisterValues);
-	}
+	void clear();
+
+	void adapt(Map<String, String> initialRegisterValues);
 }

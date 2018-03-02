@@ -1,8 +1,10 @@
-package com.github.thorbenkuck.scripting;
+package com.github.thorbenkuck.scripting.system;
 
+import com.github.thorbenkuck.scripting.Function;
+import com.github.thorbenkuck.scripting.Register;
 import com.github.thorbenkuck.scripting.exceptions.ExecutionRuntimeException;
 
-class RequireIsSetFunction implements Function {
+public class RequireIsSetFunction implements Function {
 	@Override
 	public String getFunctionName() {
 		return "require";
@@ -15,6 +17,11 @@ class RequireIsSetFunction implements Function {
 				throw new ExecutionRuntimeException("The value of " + arg + " is never set!");
 			}
 		}
+		return NO_RETURN_VALUE;
+	}
+
+	@Override
+	public String hintReturnValue() {
 		return NO_RETURN_VALUE;
 	}
 }

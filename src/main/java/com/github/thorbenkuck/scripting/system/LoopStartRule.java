@@ -1,8 +1,13 @@
-package com.github.thorbenkuck.scripting;
+package com.github.thorbenkuck.scripting.system;
+
+import com.github.thorbenkuck.scripting.Line;
+import com.github.thorbenkuck.scripting.Parser;
+import com.github.thorbenkuck.scripting.Register;
+import com.github.thorbenkuck.scripting.Rule;
 
 import java.util.function.Consumer;
 
-class LoopStartRule implements Rule {
+public class LoopStartRule implements Rule {
 
 	@Override
 	public Consumer<Register> apply(Line line, Parser parser, int linePointer) {

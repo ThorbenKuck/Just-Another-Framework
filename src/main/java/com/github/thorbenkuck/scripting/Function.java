@@ -6,39 +6,16 @@ public interface Function {
 
 	java.util.function.Function<String, String> asStringValue = string -> "\"" + string + "\"";
 
-	java.util.function.Function<String, Boolean> isVariable = string -> !string.startsWith("\"") && !string.endsWith("\"");
+	java.util.function.Function<String, Boolean> isString = string -> string.startsWith("\"") && string.endsWith("\"");
 
-	static Function print() {
-		return new PrintFunction();
-	}
-
-	static Function println() {
-		return new PrintLineFunction();
-	}
-
-	static Function require() {
-		return new RequireIsSetFunction();
-	}
-
-	static void applyDefaults(Parser parser) {
-		parser.addFunction(Function.convertToInt());
-		parser.addFunction(Function.require());
-		parser.addFunction(Function.print());
-		parser.addFunction(Function.println());
-	}
-
-	static Function convertToInt() {
-		return new ConvertToIntegerFunction();
-	}
+	java.util.function.BiFunction<String, Register, Boolean> isVariable = (string, register) -> ! isString.apply(string) && ! register.get(string).equals(Register.NULL_VALUE);
 
 	String getFunctionName();
 
-	default String calculate(String[] args, Register register) {
-		return NO_RETURN_VALUE;
-	}
+	String calculate(String[] args, Register register);
 
 	default void onParse(String[] args, Parser parser, int lineNumber) {
-
 	}
 
+	default String hintReturnValue() { return ""; }
 }

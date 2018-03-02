@@ -1,6 +1,7 @@
 package com.github.thorbenkuck.scripting;
 
 import com.github.thorbenkuck.scripting.exceptions.ParsingFailedException;
+import com.github.thorbenkuck.scripting.packages.Package;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -15,12 +16,12 @@ class ParserImpl implements Parser {
 	private final Map<String, Function> functions = new HashMap<>();
 	private final Lock functionsLock = new ReentrantLock(true);
 	private final Lock ruleLock = new ReentrantLock(true);
-	private final Register internalVariables = new Register();
+	private final Register internalVariables = Register.create();
 	// TODO: vlt mit strategyPattern dynamisch austauschbar machen
-	private final String lineEnd = ";";
 	private final AtomicInteger linePointer = new AtomicInteger();
 	private final AtomicBoolean running = new AtomicBoolean(false);
 	private final Queue<Consumer<Register>> created = new LinkedList<>();
+	private final AtomicBoolean linePointerFreeze = new AtomicBoolean(false);
 	private static int currentFunctionCount = 0;
 	private String errorMessage;
 
@@ -30,7 +31,7 @@ class ParserImpl implements Parser {
 		}
 	}
 
-	private boolean applyRule(final Line line, final Queue<Consumer<Register>> created) {
+	private boolean applyRules(final Line line, final Queue<Consumer<Register>> created) {
 		boolean success = false;
 		for (Rule rule : rules) {
 			if (rule.applies(line)) {
@@ -65,7 +66,7 @@ class ParserImpl implements Parser {
 		return functionName.toString();
 	}
 
-	private void applyFunction(final Line line) {
+	private void applyFunctions(final Line line) {
 		Line functionComplete = sliceMostOuterFunction(line);
 		Line reference = functionComplete.duplicate();
 		String functionName = sliceFunctionNameAndParametrise(functionComplete);
@@ -104,18 +105,7 @@ class ParserImpl implements Parser {
 		function.onParse(args, this, lineNumber);
 		String registerAddress = "F#" + functionName + getNextFunctionCount();
 
-		created.add(new Consumer<Register>() {
-
-			@Override
-			public void accept(Register register) {
-				register.put(registerAddress, function.calculate(args, register));
-			}
-
-			@Override
-			public String toString() {
-				return "Set register " + registerAddress + " to " + functionName + "(" + Arrays.toString(args) + ")";
-			}
-		});
+		created.add(Utility.wrapFunction(function, registerAddress, args));
 
 		return registerAddress;
 	}
@@ -141,7 +131,7 @@ class ParserImpl implements Parser {
 			final String[] parameters = getArgumentsOfFunction(args);
 
 			for (String parameter : parameters) {
-				Line newLine = new Line(parameter, args.getLineNumber());
+				Line newLine = Line.create(parameter, args.getLineNumber());
 				if (isFunction(newLine)) {
 					results.add(evaluateFunction(sliceFunctionNameAndParametrise(newLine), getParameter(newLine), args.getLineNumber()));
 				} else {
@@ -256,32 +246,6 @@ class ParserImpl implements Parser {
 		return toCheck.matches(".*[a-zA-Z0-9_][a-zA-Z0-9_-]+[ ]*\\(.*\\).*");
 	}
 
-	private List<Line> parseLines(String wholeText) {
-		List<Line> lines = new ArrayList<>();
-		StringBuilder complete = new StringBuilder(wholeText);
-		int lineNumber = 0;
-		while (! complete.toString().isEmpty()) {
-			String line;
-			if (! complete.toString().contains(lineEnd)) {
-				line = complete.toString();
-			} else {
-				line = complete.substring(0, complete.indexOf(lineEnd));
-				complete.deleteCharAt(complete.indexOf(lineEnd));
-			}
-			while (line.startsWith(" ")) {
-				line = line.substring(1, line.length());
-				complete.deleteCharAt(0);
-			}
-
-			if (! line.isEmpty()) {
-				lines.add(new Line(line, lineNumber++));
-			}
-			complete.delete(0, line.length());
-		}
-
-		return lines;
-	}
-
 	private void preEvaluation(Collection<Line> lines) {
 		for(Line line : lines) {
 			int relation = relationOpenClosed(line);
@@ -291,6 +255,27 @@ class ParserImpl implements Parser {
 				error("To many closing bracket(s): " + -relation, line.getLineNumber());
 			}
 		}
+
+		// Here we should check
+		// for unknown functions,
+		// as well as unknown rules.
+		// The getUnknownFunctionNames
+		// and getUnknownNames methods
+		// are very tricky tho.. how
+		// should this be achieved?
+		// TODO
+//		for(Line line : lines) {
+//			List<String> unknownFunctionNames = getUnknownFunctionNames(lines);
+//			if(unknownFunctionNames.size() > 0) {
+//				error("Line contains undefined function(s): " + unknownFunctionNames, line.getLineNumber());
+//				return;
+//			}
+//			List<String> unknownOtherNames = getUnknownNames(lines);
+//			if(unknownOtherNames.size() > 0) {
+//				error("I do not understand: " + unknownOtherNames, line.getLineNumber());
+//				return;
+//			}
+//		}
 	}
 
 	private int relationOpenClosed(Line line) {
@@ -299,41 +284,82 @@ class ParserImpl implements Parser {
 		return line.countCharInLine('(') - line.countCharInLine(')');
 	}
 
-	@Override
-	public synchronized Script parse(String string) throws ParsingFailedException {
-		running.set(true);
-		List<Line> lines = parseLines(string);
-		preEvaluation(lines);
+	private void checkForError(List<Line> lines) throws ParsingFailedException {
 		if (! running.get()) {
 			throw new ParsingFailedException("Stopped while parsing Script!\n" + errorMessage + "\n> (" + linePointer.get() + "): " + lines.get(linePointer.get()));
 		}
+	}
+
+	private int getCurrentLine() {
+		if(linePointerFreeze.get()) {
+			linePointerFreeze.set(false);
+			return linePointer.get();
+		}
+
+		return linePointer.incrementAndGet();
+	}
+
+	@Override
+	public synchronized Script parse(String string) throws ParsingFailedException {
+		return parse(LineProvider.ofString(string));
+	}
+
+	@Override
+	public synchronized Script parse(LineProvider lineProvider) throws ParsingFailedException {
+		running.set(true);
+		linePointerFreeze.set(false);
+		List<Line> lines = lineProvider.provide();
+		preEvaluation(lines);
+		// We check here, to ensure basic
+		// stuff works (i.e. every \\( is
+		// closed within the same line)
+		// This might be changed, to account
+		// for multi-line brackets,
+		// but it is way easier that way
+		checkForError(lines);
 		ScriptImpl result;
+		linePointer.set(0);
 
 		try {
 			functionsLock.lock();
 			ruleLock.lock();
 			for (int currentLine = 0; currentLine < lines.size(); ) {
-				if (! running.get()) {
-					throw new ParsingFailedException("Stopped while parsing Script!\n" + errorMessage + "\n> (" + linePointer.get() + "): " + lines.get(linePointer.get()));
-				}
 				Line line = lines.get(currentLine).duplicate();
 				boolean workedOn = true;
 				while (! line.isEmpty() && workedOn) {
+					workedOn = false;
 					try {
 						if (containsFunction(line.toString())) {
-							applyFunction(line);
+							applyFunctions(line);
 							workedOn = true;
-						} else if (applyRule(line, created)) {
-							workedOn = false;
-						} else {
-							workedOn = false;
 						}
+						applyRules(line, created);
 					} catch (Exception e) {
 						throw new ParsingFailedException("Encountered Exception while parsing!", e);
 					}
 				}
-				currentLine = linePointer.incrementAndGet();
+
+				// If an error occurs, we
+				// want to detect it as early
+				// as possible, so that we
+				// do no unnecessary parsing
+				// and take up resources, we
+				// do not need in the end.
+				// Therefor we check every time
+				// if an error occurred. Just
+				// then we increase the line counter
+				checkForError(lines);
+				currentLine = getCurrentLine();
 			}
+
+			// Here we assume, we parsed
+			// correctly (since we threw
+			// no exception). But to check,
+			// for any potential error in
+			// the last line, we have to
+			// check again, if we
+			// terminated ahead of time.
+			checkForError(lines);
 		} finally {
 			functionsLock.unlock();
 			ruleLock.unlock();
@@ -351,8 +377,14 @@ class ParserImpl implements Parser {
 	}
 
 	@Override
+	public void freezeLinePointer() {
+		linePointerFreeze.set(true);
+	}
+
+	@Override
 	public void setLinePointer(int to) {
 		this.linePointer.set(to);
+		this.linePointerFreeze.set(true);
 	}
 
 	@Override
@@ -366,20 +398,15 @@ class ParserImpl implements Parser {
 	}
 
 	@Override
-	public void addRule(Rule rule) {
-		try {
-			ruleLock.lock();
-			this.rules.add(rule);
-		} finally {
-			ruleLock.unlock();
-		}
+	public void error(String message, int lineNumber) {
+		running.set(false);
+		linePointer.set(lineNumber);
+		errorMessage = "error " + message;
 	}
 
 	@Override
-	public void error(String s, int lineNumber) {
-		running.set(false);
-		linePointer.set(lineNumber);
-		errorMessage = "error " + s;
+	public void error(final String message) {
+		error(message, linePointer.get());
 	}
 
 	@Override
@@ -398,7 +425,7 @@ class ParserImpl implements Parser {
 	}
 
 	@Override
-	public void addFunction(Function function) {
+	public void add(Function function) {
 		try {
 			functionsLock.lock();
 			functions.put(function.getFunctionName(), function);
@@ -408,11 +435,31 @@ class ParserImpl implements Parser {
 	}
 
 	@Override
+	public void add(Rule rule) {
+		try {
+			ruleLock.lock();
+			this.rules.add(rule);
+		} finally {
+			ruleLock.unlock();
+		}
+	}
+
+	@Override
+	public void add(Package newPackage) {
+		for(Rule rule : newPackage.getRules()) {
+			add(rule);
+		}
+
+		for(Function function : newPackage.getFunctions()) {
+			add(function);
+		}
+	}
+
+	@Override
 	public String toString() {
 		return "Parser{" +
 				"rules=" + rules +
 				", internalVariables=" + internalVariables +
-				", lineEnd='" + lineEnd + '\'' +
 				", linePointer=" + linePointer +
 				", running=" + running +
 				'}';

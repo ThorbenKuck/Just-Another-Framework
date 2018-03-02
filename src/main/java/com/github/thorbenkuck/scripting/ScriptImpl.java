@@ -10,18 +10,21 @@ class ScriptImpl implements Script {
 	private final Queue<Consumer<Register>> core = new LinkedList<>();
 	private final Map<String, String> initialRegisterValues = new HashMap<>();
 
-	ScriptImpl() {
-		this(new LinkedList<>());
-	}
-
 	ScriptImpl(Queue<Consumer<Register>> core) {
 		this.core.addAll(core);
 	}
 
-	void setConsumer(Collection<Consumer<Register>> consumer) {
+	void setInstructions(Collection<Consumer<Register>> consumer) {
 		synchronized (core) {
 			core.clear();
 			core.addAll(consumer);
+		}
+	}
+
+	@Override
+	public void addInstruction(Consumer<Register> instruction) {
+		synchronized (core) {
+			core.add(instruction);
 		}
 	}
 
@@ -35,7 +38,7 @@ class ScriptImpl implements Script {
 
 	@Override
 	public void run() throws ExecutionFailedException {
-		final Register register = new Register();
+		final Register register = Register.create();
 		synchronized (initialRegisterValues) {
 			register.adapt(initialRegisterValues);
 		}

@@ -1,4 +1,8 @@
-package com.github.thorbenkuck.scripting;
+package com.github.thorbenkuck.scripting.system;
+
+import com.github.thorbenkuck.scripting.Function;
+import com.github.thorbenkuck.scripting.Register;
+import com.github.thorbenkuck.scripting.Utility;
 
 public class ConvertToIntegerFunction implements Function {
 
@@ -14,10 +18,15 @@ public class ConvertToIntegerFunction implements Function {
 			if(value.equals(Register.NULL_VALUE)) {
 				continue;
 			}
-			if(!Utility.isInteger(value)) {
+			if(! Utility.isInteger(value)) {
 				register.put(arg, "0");
 			}
 		}
+		return NO_RETURN_VALUE;
+	}
+
+	@Override
+	public String hintReturnValue() {
 		return NO_RETURN_VALUE;
 	}
 }

@@ -3,19 +3,28 @@ package com.github.thorbenkuck.scripting.test;
 import com.github.thorbenkuck.scripting.*;
 import com.github.thorbenkuck.scripting.exceptions.ExecutionFailedException;
 import com.github.thorbenkuck.scripting.exceptions.ParsingFailedException;
+import com.github.thorbenkuck.scripting.io.IOModule;
+import com.github.thorbenkuck.scripting.math.MathModule;
+import com.github.thorbenkuck.scripting.packages.Package;
+import com.github.thorbenkuck.scripting.packages.PackageBuilder;
+import com.github.thorbenkuck.scripting.system.SystemModule;
 
 import java.util.*;
 import java.util.function.Consumer;
 
 public class ScriptingTest {
 
-	private static String toEvaluate = "println(add(add(add(add(x), x), add(x), add(x)), add(x), x));" +
-			"println(get(x))";
+	private static String toEvaluate = "var y = subtract(add(add(add(x, x), x), add(x, x), add(x, x)), add(x, x), x);" +
+	        "require(y);println(\"y=\", y);" +
+	        "println(\"y^2=\", y, \"^2=\", pow(y, 2));" +
+	        "--y;println(\"y=\", y);" +
+	        "println(\"y^3=\", y, \"^3=\", pow(y, 3));" +
+			"println(x, \"+\", x, \"=\", add(x, x));" +
+			"println(\"x=\", x);";
 
 	private static String toEvaluateHarder =
 			"println(\"DEMO-SCRIPT!\");" +
 					"require(x);" +
-					"println(arr[ab]);" +
 					"convertToInt(x);" +
 					"var y = x;" +
 					"require(y);" +
@@ -42,10 +51,13 @@ public class ScriptingTest {
 	public static void main(String[] args) {
 		Parser parser = Parser.create();
 
-		parser.addFunction(new ExampleFunction());
-		Rule.applyDefaults(parser);
-		Function.applyDefaults(parser);
+		Package foundation = PackageBuilder.get()
+				.add(IOModule.getPackage())
+				.add(SystemModule.getPackage())
+				.add(MathModule.getPackage())
+				.create();
 
+		parser.add(foundation);
 
 		System.out.println("parsing executable script ..");
 		Script script;
@@ -84,49 +96,6 @@ public class ScriptingTest {
 		} catch (IllegalStateException | NoSuchElementException e) {
 			// System.in has been closed
 			System.out.println("System.in was closed; exiting");
-		}
-	}
-
-	private static class ExampleFunction implements Function {
-		@Override
-		public String getFunctionName() {
-			return "add";
-		}
-
-		@Override
-		public String calculate(String[] args, Register register) {
-			int count = 0;
-
-			if (args.length > 0) {
-				Queue<String> leftOver = new LinkedList<>(Arrays.asList(args));
-				StringBuilder result = new StringBuilder();
-				while (leftOver.peek() != null) {
-					String arg = leftOver.poll();
-					String value;
-					if(isVariable.apply(arg)) {
-						value = register.get(arg);
-					} else {
-						value = arg;
-					}
-					result.append(value);
-					if(Utility.isInteger(value)) {
-						count += Integer.parseInt(value);
-					} else {
-						count += 0;
-					}
-					if (leftOver.peek() != null) {
-						result.append(" AND ");
-					}
-				}
-				if(args.length > 1) {
-					result.append(" = ").append(count);
-				}
-				System.out.println(result.toString());
-
-				return Integer.toString(count);
-			}
-
-			return String.valueOf(count);
 		}
 	}
 }

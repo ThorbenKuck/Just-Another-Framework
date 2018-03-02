@@ -1,6 +1,7 @@
 package com.github.thorbenkuck.scripting;
 
 import com.github.thorbenkuck.scripting.exceptions.ParsingFailedException;
+import com.github.thorbenkuck.scripting.packages.Package;
 
 import java.util.function.Consumer;
 
@@ -12,15 +13,23 @@ public interface Parser {
 
 	Script parse(String string) throws ParsingFailedException;
 
+	Script parse(LineProvider lineProvider) throws ParsingFailedException;
+
+	void freezeLinePointer();
+
 	void setLinePointer(int to);
 
 	void setInternalVariable(String key, String value);
 
 	String getInternalVariable(String key);
 
-	void addRule(Rule rule);
+	void add(Rule rule);
 
-	void error(String s, int lineNumber);
+	void error(String message, int lineNumber);
+
+	void add(Package newPackage);
+
+	void error(String message);
 
 	void clearInternalVariable(String name);
 
@@ -28,5 +37,5 @@ public interface Parser {
 
 	void deleteInternalVariable(String name);
 
-	void addFunction(Function function);
+	void add(Function function);
 }

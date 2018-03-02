@@ -1,14 +1,15 @@
-package com.github.thorbenkuck.scripting;
+package com.github.thorbenkuck.scripting.system;
 
+import com.github.thorbenkuck.scripting.*;
 import com.github.thorbenkuck.scripting.exceptions.ExecutionRuntimeException;
 
 import java.util.function.Consumer;
 
-class VariableDefinitionRule implements Rule {
+public class VariableDefinitionRule implements Rule {
 
 	@Override
 	public boolean applies(Line line) {
-		return line.matches("[a-zA-Z0-9]+[ ]*=[ ]*[a-zA-Z0-9]+");
+		return line.matches(".+[ ]*=[ ]*.+");
 	}
 
 	@Override
@@ -23,7 +24,7 @@ class VariableDefinitionRule implements Rule {
 					parser.error(name + " is not defined", line.getLineNumber());
 				} else {
 					String value = stringBuilder.toString();
-					if(Function.isVariable.apply(value)) {
+					if(Function.isVariable.apply(value, register)) {
 						String savedValue = register.get(value);
 						if(Register.NULL_VALUE.equals(savedValue)) {
 							throw new ExecutionRuntimeException("Tried to set null variable!");
