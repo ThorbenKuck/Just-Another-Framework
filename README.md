@@ -33,6 +33,16 @@ NOT YET AVAILABLE
 A "simple" Example:
 
 ```java
+import com.github.thorbenkuck.scripting.Parser;
+import com.github.thorbenkuck.scripting.Script;
+import com.github.thorbenkuck.scripting.exceptions.ExecutionFailedException;
+import com.github.thorbenkuck.scripting.exceptions.ParsingFailedException;
+import com.github.thorbenkuck.scripting.io.IOModule;
+import com.github.thorbenkuck.scripting.math.MathModule;
+import com.github.thorbenkuck.scripting.packages.Package;
+import com.github.thorbenkuck.scripting.packages.PackageBuilder;
+import com.github.thorbenkuck.scripting.system.SystemModule;
+
 public class Example {
 	public void run() {
         // The Script we want to evaluate.
@@ -41,7 +51,7 @@ public class Example {
         // Every function and rule is supported by this framework
         // This is the best i could come up with.. sorry for 
         // possible confusions.. Let me explain those functions:
-        
+   
         //print(..)       prints something
         //println(..)     prints something followed by a new line
         //require($)      throws an exception, if variable($) is not set
@@ -51,67 +61,73 @@ public class Example {
         //var $           marks an variable as usable($)
         //$ = %           sets the usable variable $ to %
         String toEvaluate =
-          "println(\"DEMO-SCRIPT!\");" +
-          "require(x);" +
-          "convertToInt(x);" +
-          "var y = x;" +
-          "require(y);" +
-          "loop i 1:5;" +
-          "    print(i);" +
-          "    print(\"=\");" +
-          "    println(y);" +
-          "    loop j 1:3;" +
-          "        ++y;" +
-          "    endLoop j;" +
-          "endLoop i;" +
-          "print(\"x should still be what you selected: \");" +
-          "println(x);" +
-          "print(\"i=\");" +
-          "println(i);" +
-          "print(\"j=\");" +
-          "println(j);" +
-          "var z;" +
-          "print(\"z=\");println(z);" +
-          "println(\"END\");";
-        
+                "println(\"DEMO-SCRIPT!\");" +
+                        "require(x);" +
+                        "convertToInt(x);" +
+                        "var y = x;" +
+                        "require(y);" +
+                        "loop i 1:5;" +
+                        "    print(i);" +
+                        "    print(\"=\");" +
+                        "    println(y);" +
+                        "    loop j 1:3;" +
+                        "        ++y;" +
+                        "    endLoop j;" +
+                        "endLoop i;" +
+                        "print(\"x should still be what you selected: \");" +
+                        "println(x);" +
+                        "print(\"i=\");" +
+                        "println(i);" +
+                        "print(\"j=\");" +
+                        "println(j);" +
+                        "var z;" +
+                        "print(\"z=\");println(z);" +
+                        "println(\"END\");";
+   
         // Creates a new Parser.
         // Every Parser is unique and
         // maintains its own set of rules
         // and functions.
         Parser parser = Parser.create();
-        
+   
         // Hook up all your rules and functions
         // Here, we use the provided ones and
         // simply apply all default Rules
-        // and Functions
-        
+        // and Functions.
+        // Make sure, that you import the
+        // correct Package. Java has its own
+        // package, which is part of java.lang.
+        // This means, if you import nothing,
+        // you will get an error, because the
+        // PackageBuilder returns the wrong type
+        // of package.
         Package foundation = PackageBuilder.get()
                 .add(IOModule.getPackage())
                 .add(SystemModule.getPackage())
                 .add(MathModule.getPackage())
                 .create();
-        
+   
         parser.add(foundation);
-        
+   
         // Parse the Script.
         // This will return an executable script
         Script script;
         try {
-          script = parser.parse(toEvaluate);
+            script = parser.parse(toEvaluate);
         } catch (ParsingFailedException e) {
-          e.printStackTrace();
-          return;
+            e.printStackTrace();
+            return;
         }
-        
+   
         System.out.println("script parsed!");
-        
+   
         // Prints every step the script is going to take
         // If the Output is to much for you, simply delte
         // this following 3 lines.
         System.out.println();
         System.out.println(script);
         System.out.println();
-        
+   
         // Inject "outside" variables.
         // You can also set them, once you
         // call Script#run by providing
@@ -121,17 +137,16 @@ public class Example {
         // Strings, which we might convert
         // to Objects as we execute our java-code
         script.setValue("x", "10");
-        
+   
         // Now we run our Script. This may throw an
         // ExecutionFailedException if anything
         // goes wrong as we run it. Should not
         // happen here tho
         try {
-          script.run();
+            script.run();
         } catch (ExecutionFailedException e) {
-          e.printStackTrace(System.out);
+            e.printStackTrace(System.out);
         }
-        
     }
 }
 ```
