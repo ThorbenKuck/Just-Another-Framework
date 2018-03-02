@@ -135,3 +135,76 @@ public class Example {
     }
 }
 ```
+
+---
+
+## Custom Functions
+
+If you want to create a custom Function, you may override the <code>Function</code> interface. Functions are evaluated at runtime. Let's create an mathematicall add function, that allows any number of parameters. It would look like this:
+
+```java
+public class AddFunction implements Function {
+    @Override
+    public String getFunctionName() {
+        return "add";
+    }
+
+    @Override
+    public String calculate(String[] args, Register register) {
+        int count = 0;
+
+        if (args.length > 0) {
+            Queue<String> leftOver = new LinkedList<>(Arrays.asList(args));
+            while (leftOver.peek() != null) {
+                String arg = leftOver.poll();
+	        String value;
+                if(isVariable.apply(arg)) {
+                    value = register.get(arg);
+                } else {
+                   value = arg;
+                }
+        	    result.append(value);
+                if(Utility.isInteger(value)) {
+                    count += Integer.parseInt(value);
+                } else {
+                    count += 0;
+                }
+            }
+        }
+        return String.valueOf(count);
+    }
+}
+```
+
+Let's parse an example Skript:
+
+```java
+String toEvaluate = "var x = 1;"
+               + "println(add(add(add(add(x), x), add(x), add(x)), add(x), x));";
+
+Parser parser = Parser.create();
+
+Rule.applyDefault(parser);
+Function.applyDefault(parser);
+
+Script script;
+try {
+    script = parser.parse(toEvaluate);
+} catch (ParsingFailedException e) {
+    e.printStackTrace();
+    return;
+}
+try {
+    script.run();
+} catch (ExecutionFailedException e) {
+    e.printStackTrace(System.out);
+}
+```
+
+This produces the output <code>6</code>
+
+---
+
+## Custom Rules
+
+<b>WORK IN PROGRESS</b>
