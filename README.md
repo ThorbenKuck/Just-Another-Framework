@@ -12,7 +12,7 @@ This Framework also is NOT optimized! There is still some quirky Code inside! Do
 
 ## Version
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.thorbenkuck/NetCom2/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.thorbenkuck/NetCom2)   
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.thorbenkuck/Scripting/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.thorbenkuck/Scripting)   
 
 ------
 
