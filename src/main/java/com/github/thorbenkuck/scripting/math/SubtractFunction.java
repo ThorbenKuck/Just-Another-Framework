@@ -32,8 +32,8 @@ public class SubtractFunction implements Function {
 		// we subtract correctly.
 		int sum;
 		String value = getValue(args[0], register);
-		if (Utility.isInteger(value)) {
-			sum = Integer.parseInt(value);
+		if (Utility.isInteger(value, register)) {
+			sum = Utility.toInt(value, register);
 		} else {
 			sum = 0;
 			System.out.println("Unknown type provided to subtract: " + value);
@@ -43,8 +43,8 @@ public class SubtractFunction implements Function {
 		for (String arg : args) {
 			value = getValue(arg, register);
 
-			if (Utility.isInteger(value)) {
-				sum -= Integer.parseInt(value);
+			if (Utility.isInteger(value, register)) {
+				sum -= Utility.toInt(value, register);
 			} else {
 				System.out.println("Unknown type provided to subtract: " + arg);
 			}

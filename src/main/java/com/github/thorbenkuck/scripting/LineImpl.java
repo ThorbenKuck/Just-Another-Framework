@@ -156,6 +156,11 @@ class LineImpl implements Line {
 		return count;
 	}
 
+	@Override
+	public void clear() {
+		this.content = null;
+	}
+
 	/**
 	 * Returns an iterator over elements of type {@code T}.
 	 *

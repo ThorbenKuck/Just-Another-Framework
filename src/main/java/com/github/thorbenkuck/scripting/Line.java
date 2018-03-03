@@ -53,4 +53,6 @@ public interface Line extends Iterable<Character> {
 	void removeLast();
 
 	int countCharInLine(char toCount);
+
+	void clear();
 }

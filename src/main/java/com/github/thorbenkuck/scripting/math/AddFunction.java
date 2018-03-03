@@ -13,25 +13,45 @@ public class AddFunction implements Function {
 		return "add";
 	}
 
+	private String calculateDoubles(final String[] args, Register register) {
+		double count = 0;
+		for (String arg : args) {
+			if (Utility.isDouble(arg, register)) {
+				count += Utility.toDouble(arg, register);
+			} else {
+				System.out.println("Unknown type provided to add: " + arg);
+			}
+		}
+		return String.valueOf(count);
+	}
+
 	@Override
 	public String calculate(final String[] args, final Register register) {
-		int count = 0;
-
+		boolean doubleValueContained = false;
 		for (String arg : args) {
-			String value;
-			if (isVariable.apply(arg, register)) {
-				value = register.get(arg);
-			} else {
-				value = arg;
-			}
-
-			if (Utility.isInteger(value)) {
-				count += Integer.parseInt(value);
-			} else {
-				System.out.println("Unknown type provided to subtract: " + arg);
+			if (Utility.isDouble(arg, register)) {
+				doubleValueContained = true;
+				break;
 			}
 		}
 
+		if (doubleValueContained) {
+			return calculateDoubles(args, register);
+		} else {
+			return calculateInt(args, register);
+		}
+
+	}
+
+	private String calculateInt(final String[] args, final Register register) {
+		int count = 0;
+		for (String arg : args) {
+			if (Utility.isInteger(arg, register)) {
+				count += Utility.toInt(arg, register);
+			} else {
+				System.out.println("Unknown type provided to add: " + arg);
+			}
+		}
 		return String.valueOf(count);
 	}
 

@@ -15,7 +15,8 @@ import java.util.List;
 public class GithubExample {
 
 	public static void main(String[] args) {
-		new GithubExample().run();
+		GithubExample githubExample = new GithubExample();
+		githubExample.run();
 	}
 
 	public void run() {
@@ -59,7 +60,7 @@ public class GithubExample {
 
 		@Override
 		public String calculate(final String[] args, final Register register) {
-			if(! Utility.isDouble(args[0], register)) {
+			if (! Utility.isDouble(args[0], register)) {
 				throw new ExecutionRuntimeException("Given " + Arrays.toString(args));
 			}
 			String value = args[0];
@@ -72,7 +73,7 @@ public class GithubExample {
 
 		@Override
 		public void onParse(final String[] args, final Parser parser, final int lineNumber) {
-			if(args.length != 1) {
+			if (args.length != 1) {
 				parser.error(getFunctionName() + " requires on parameter, " + args.length + " given.");
 			}
 		}
