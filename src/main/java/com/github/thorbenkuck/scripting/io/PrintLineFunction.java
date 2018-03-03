@@ -4,20 +4,32 @@ import com.github.thorbenkuck.scripting.Function;
 import com.github.thorbenkuck.scripting.Register;
 import com.github.thorbenkuck.scripting.Utility;
 
+import java.io.PrintStream;
+
 public class PrintLineFunction implements Function {
+
+	private final PrintStream out;
+
+	public PrintLineFunction() {
+		this(System.out);
+	}
+
+	public PrintLineFunction(final PrintStream out) {
+		this.out = out;
+	}
 
 	@Override
 	public String calculate(String[] args, Register register) {
 		if(args.length == 0) {
-			IOUtils.printAccordingToType("", register, "\n");
+			IOUtils.printAccordingToType("", register, out, "\n");
 			return NO_RETURN_VALUE;
 		}
 
 		for(String name : args) {
-			IOUtils.printAccordingToType(name, register);
+			IOUtils.printAccordingToType(name, register, out);
 		}
 
-		Utility.createPrintLineText("").accept(register);
+		IOUtils.printAccordingToType("", register, out, "\n");
 
 		return NO_RETURN_VALUE;
 	}

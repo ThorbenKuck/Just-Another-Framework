@@ -1,23 +1,37 @@
 package com.github.thorbenkuck.scripting.io;
 
 import com.github.thorbenkuck.scripting.Function;
+import com.github.thorbenkuck.scripting.Parser;
 import com.github.thorbenkuck.scripting.Register;
-import com.github.thorbenkuck.scripting.exceptions.ExecutionRuntimeException;
+
+import java.io.PrintStream;
 
 public class PrintFunction implements Function {
 
-	// TODO Pre-evaluation check for arguments
+	private final PrintStream out;
+
+	public PrintFunction() {
+		this(System.out);
+	}
+
+	public PrintFunction(final PrintStream out) {
+		this.out = out;
+	}
 
 	@Override
 	public String calculate(String[] args, Register register) {
-		if(args.length == 0) {
-			throw new ExecutionRuntimeException("No parameters for print given!");
-		}
 		for(String name : args) {
-			IOUtils.printAccordingToType(name, register);
+			IOUtils.printAccordingToType(name, register, out);
 		}
 
 		return NO_RETURN_VALUE;
+	}
+
+	@Override
+	public void onParse(final String[] args, final Parser parser, final int lineNumber) {
+		if(args.length == 0) {
+			parser.error(getFunctionName() + " expects at least one argument");
+		}
 	}
 
 	@Override

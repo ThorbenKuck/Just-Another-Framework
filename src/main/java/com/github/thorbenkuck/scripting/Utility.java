@@ -117,6 +117,10 @@ public class Utility {
 		}
 	}
 
+	public static boolean isDouble(String s, Register register) {
+		return isDouble(s) || isDouble(register.get(s));
+	}
+
 	public static double toDouble(String s) {
 		return toDouble(s, 0.0);
 	}
