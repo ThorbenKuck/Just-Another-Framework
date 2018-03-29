@@ -1,16 +1,13 @@
 package com.github.thorbenkuck.scripting.system;
 
-import com.github.thorbenkuck.scripting.Line;
-import com.github.thorbenkuck.scripting.Parser;
-import com.github.thorbenkuck.scripting.Register;
-import com.github.thorbenkuck.scripting.Rule;
+import com.github.thorbenkuck.scripting.*;
 
 import java.util.function.Consumer;
 
 public class LoopStartRule implements Rule {
 
 	@Override
-	public Consumer<Register> apply(Line line, Parser parser, int linePointer) {
+	public ScriptElement<Register> apply(Line line, Parser parser, int linePointer) {
 		String rawArgs = line.toString();
 		String withoutIdentifier = rawArgs.substring(5, rawArgs.length());
 		StringBuilder stringBuilder = new StringBuilder(withoutIdentifier);
@@ -30,7 +27,7 @@ public class LoopStartRule implements Rule {
 				parser.deleteInternalVariable(name);
 				parser.clearInternalVariable("loop" + name);
 				parser.clearInternalVariable("loopEnd" + name);
-				return new Consumer<Register>() {
+				return new ScriptElement<Register>() {
 					@Override
 					public void accept(Register register) {
 						register.remove(name);
@@ -43,7 +40,7 @@ public class LoopStartRule implements Rule {
 				};
 			} else {
 				parser.setInternalVariable(name, stringedValue);
-				return new Consumer<Register>() {
+				return new ScriptElement<Register>() {
 					@Override
 					public void accept(Register register) {
 						int count = Integer.parseInt(register.get(name));
@@ -61,7 +58,7 @@ public class LoopStartRule implements Rule {
 		} else {
 			parser.setInternalVariable(name, initial);
 			parser.setInternalVariable("loop" + name, String.valueOf(linePointer - 1));
-			return new Consumer<Register>() {
+			return new ScriptElement<Register>() {
 				@Override
 				public void accept(Register register) {
 					register.put(name, initial);

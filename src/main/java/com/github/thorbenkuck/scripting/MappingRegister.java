@@ -3,7 +3,7 @@ package com.github.thorbenkuck.scripting;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MappingRegister implements Register {
+class MappingRegister implements Register {
 
 	private final Map<String, String> core = new HashMap<>();
 

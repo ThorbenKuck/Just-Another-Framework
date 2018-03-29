@@ -13,10 +13,10 @@ public class VariableDefinitionRule implements Rule {
 	}
 
 	@Override
-	public Consumer<Register> apply(Line line, Parser parser, int linePointer) {
+	public ScriptElement<Register> apply(Line line, Parser parser, int linePointer) {
 		String name = parseVariableName(line.duplicate());
 		String value = parseVariableValue(line.duplicate());
-		return new Consumer<Register>() {
+		return new ScriptElement<Register>() {
 			@Override
 			public void accept(Register register) {
 				if(Register.NULL_VALUE.equals(register.get(name))) {

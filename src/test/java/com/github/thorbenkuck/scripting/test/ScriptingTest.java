@@ -36,16 +36,13 @@ public class ScriptingTest {
 					"        ++y;" +
 					"    endLoop j;" +
 					"endLoop i;" +
-					"print(\"x should still be what you selected: \");" +
-					"println(x);" +
-					"print(\"i=\");" +
-					"println(i);" +
-					"print(\"j=\");" +
-					"println(j);" +
+					"println(\"x should still be what you selected: \", x);" +
+					"println(\"i=\", i);" +
+					"print(\"j=\", j);" +
 					"var z;" +
-					"print(\"z=\");println(z);" +
+					"println(\"z=\", z);" +
 					"delete z;" +
-					"print(\"z=\");println(z);" +
+					"println(\"z=\");" +
 					"println(\"END\");";
 
 	public static void main(String[] args) {

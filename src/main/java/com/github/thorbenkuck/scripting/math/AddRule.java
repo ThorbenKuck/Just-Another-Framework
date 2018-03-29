@@ -15,7 +15,7 @@ public class AddRule implements Rule {
 	}
 
 	@Override
-	public Consumer<Register> apply(final Line line, final Parser parser, final int linePointer) {
+	public ScriptElement<Register> apply(final Line line, final Parser parser, final int linePointer) {
 		// Since we are lazy,
 		// we just wrap the
 		// add function, to

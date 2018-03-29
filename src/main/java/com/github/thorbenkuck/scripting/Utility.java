@@ -5,8 +5,8 @@ import java.util.function.Consumer;
 
 public class Utility {
 
-	public static Consumer<Register> createPrintVariable(String variableName) {
-		return new Consumer<Register>() {
+	public static ScriptElement<Register> createPrintVariable(String variableName) {
+		return new ScriptElement<Register>() {
 			public void accept(Register register) {
 				System.out.print(register.get(variableName));
 			}
@@ -18,9 +18,9 @@ public class Utility {
 		};
 	}
 
-	public static Consumer<Register> createPrintText(String what) {
+	public static ScriptElement<Register> createPrintText(String what) {
 
-		return new Consumer<Register>() {
+		return new ScriptElement<Register>() {
 			public void accept(Register register) {
 				System.out.print(what);
 			}
@@ -32,8 +32,8 @@ public class Utility {
 		};
 	}
 
-	public static Consumer<Register> createPrintLineVariable(String variableName) {
-		return new Consumer<Register>() {
+	public static ScriptElement<Register> createPrintLineVariable(String variableName) {
+		return new ScriptElement<Register>() {
 			public void accept(Register register) {
 				System.out.println(register.get(variableName));
 			}
@@ -45,8 +45,8 @@ public class Utility {
 		};
 	}
 
-	public static Consumer<Register> createPrintLineText(String what) {
-		return new Consumer<Register>() {
+	public static ScriptElement<Register> createPrintLineText(String what) {
+		return new ScriptElement<Register>() {
 			public void accept(Register register) {
 				System.out.println(what);
 			}
@@ -58,9 +58,9 @@ public class Utility {
 		};
 	}
 
-	public static Consumer<Register> wrapFunction(Function function, String registerAddress, String[] args) {
+	public static ScriptElement<Register> wrapFunction(Function function, String registerAddress, String[] args) {
 		if(Function.NO_RETURN_VALUE.equals(function.hintReturnValue())) {
-			return new Consumer<Register>() {
+			return new ScriptElement<Register>() {
 
 				@Override
 				public void accept(Register register) {
@@ -73,7 +73,7 @@ public class Utility {
 				}
 			};
 		} else {
-			return new Consumer<Register>() {
+			return new ScriptElement<Register>() {
 
 				@Override
 				public void accept(Register register) {

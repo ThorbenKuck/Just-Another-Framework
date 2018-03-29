@@ -2,19 +2,21 @@ package com.github.thorbenkuck.scripting;
 
 import com.github.thorbenkuck.scripting.exceptions.ExecutionFailedException;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Consumer;
 
 class ScriptImpl implements Script {
 
-	private final Queue<Consumer<Register>> core = new LinkedList<>();
+	private final Queue<ScriptElement<Register>> core = new LinkedList<>();
 	private final Map<String, String> initialRegisterValues = new HashMap<>();
+	private String name = "Script(" + LocalDateTime.now() + ")";
 
-	ScriptImpl(Queue<Consumer<Register>> core) {
+	ScriptImpl(Queue<ScriptElement<Register>> core) {
 		this.core.addAll(core);
 	}
 
-	void setInstructions(Collection<Consumer<Register>> consumer) {
+	void setInstructions(Collection<ScriptElement<Register>> consumer) {
 		synchronized (core) {
 			core.clear();
 			core.addAll(consumer);
@@ -22,7 +24,7 @@ class ScriptImpl implements Script {
 	}
 
 	@Override
-	public void addInstruction(Consumer<Register> instruction) {
+	public void addInstruction(ScriptElement<Register> instruction) {
 		synchronized (core) {
 			core.add(instruction);
 		}
@@ -42,14 +44,14 @@ class ScriptImpl implements Script {
 		synchronized (initialRegisterValues) {
 			register.adapt(initialRegisterValues);
 		}
-		Queue<Consumer<Register>> consumerCopy;
+		Queue<ScriptElement<Register>> copy;
 		synchronized (core) {
-			consumerCopy = new LinkedList<>(core);
+			copy = new LinkedList<>(core);
 		}
 
 		try {
-			while(consumerCopy.peek() != null) {
-				Consumer<Register> consumer = consumerCopy.poll();
+			while(copy.peek() != null) {
+				ScriptElement<Register> consumer = copy.poll();
 				consumer.accept(register);
 			}
 		} catch (Exception e) {
@@ -62,14 +64,15 @@ class ScriptImpl implements Script {
 	@Override
 	public String toString() {
 		int lineCounter = 0;
-		StringBuilder result = new StringBuilder("------ SCRIPT_START" + System.lineSeparator());
+		StringBuilder result = new StringBuilder(getName());
+		result.append("------ SCRIPT_START").append(System.lineSeparator());
 
-		final List<Consumer<Register>> consumerCopy;
+		final List<ScriptElement<Register>> consumerCopy;
 		synchronized (core) {
 			consumerCopy = new ArrayList<>(core);
 		}
 
-		for(Consumer<Register> consumer : consumerCopy) {
+		for(ScriptElement<Register> consumer : consumerCopy) {
 			result.append("(").append(lineCounter++).append("): ").append(consumer).append(System.lineSeparator());
 		}
 		result.append("------ SCRIPT_END");
@@ -86,5 +89,15 @@ class ScriptImpl implements Script {
 		synchronized (core) {
 			return core.size();
 		}
+	}
+
+	@Override
+	public void setName(String string) {
+		this.name = string;
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 }

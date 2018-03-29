@@ -13,9 +13,9 @@ public class DecrementRule implements Rule {
 	}
 
 	@Override
-	public Consumer<Register> apply(Line line, Parser parser, int linePointer) {
+	public ScriptElement<Register> apply(Line line, Parser parser, int linePointer) {
 		String reference = line.subpart(2, line.length()).toString();
-		return new Consumer<Register>() {
+		return new ScriptElement<Register>() {
 			@Override
 			public void accept(Register register) {
 				if(register.get(reference).equals(Register.NULL_VALUE)) {

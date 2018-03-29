@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public interface Script {
-	void addInstruction(Consumer<Register> instruction);
+	void addInstruction(ScriptElement<Register> instruction);
 
 	void run(Map<String, String> registerValues) throws ExecutionFailedException;
 
@@ -15,4 +15,8 @@ public interface Script {
 	void setValue(String key, String value);
 
 	int countInstructions();
+
+	void setName(String string);
+
+	String getName();
 }

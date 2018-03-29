@@ -1,11 +1,12 @@
 package com.github.thorbenkuck.scripting;
 
+import com.github.thorbenkuck.keller.pipe.Pipeline;
 import com.github.thorbenkuck.scripting.exceptions.ParsingFailedException;
 import com.github.thorbenkuck.scripting.packages.Package;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -17,13 +18,21 @@ class ParserImpl implements Parser {
 	private final Lock functionsLock = new ReentrantLock(true);
 	private final Lock ruleLock = new ReentrantLock(true);
 	private final Register internalVariables = Register.create();
-	// TODO: vlt mit strategyPattern dynamisch austauschbar machen
-	private final AtomicInteger linePointer = new AtomicInteger();
 	private final AtomicBoolean running = new AtomicBoolean(false);
-	private final Queue<Consumer<Register>> created = new LinkedList<>();
-	private final AtomicBoolean linePointerFreeze = new AtomicBoolean(false);
+	private final Queue<ScriptElement<Register>> created = new LinkedList<>();
+	private final Pipeline<ParsingFailedException> errorPipeline = Pipeline.unifiedCreation();
+	private final AtomicReference<DiagnosticManager> diagnosticManagerReference;
+	private final DefaultLineParser lineParser = new DefaultLineParser();
 	private static int currentFunctionCount = 0;
-	private String errorMessage;
+	private final List<String> errorMessages = new ArrayList<>();
+
+	ParserImpl() {
+		this(DiagnosticManager.createDefault());
+	}
+
+	ParserImpl(DiagnosticManager diagnosticManager) {
+		this.diagnosticManagerReference = new AtomicReference<>(diagnosticManager);
+	}
 
 	private int getNextFunctionCount() {
 		synchronized (this) {
@@ -31,11 +40,11 @@ class ParserImpl implements Parser {
 		}
 	}
 
-	private boolean applyRules(final Line line, final Queue<Consumer<Register>> created) {
+	private boolean applyRules(final Line line, final Queue<ScriptElement<Register>> created) {
 		boolean success = false;
 		for (Rule rule : rules) {
 			if (rule.applies(line)) {
-				Consumer<Register> consumer = rule.apply(line, this, linePointer.get());
+				ScriptElement<Register> consumer = rule.apply(line, this, line.getLineNumber());
 				if (consumer != null) {
 					created.add(consumer);
 					success = true;
@@ -51,7 +60,7 @@ class ParserImpl implements Parser {
 
 		line.trimLeadingWhiteSpaces();
 
-		while (! (line.startsWith(" ") || line.startsWith("("))) {
+		while (!(line.startsWith(" ") || line.startsWith("("))) {
 			functionName.append(line.toString().toCharArray()[0]);
 			line.remove(0);
 		}
@@ -90,7 +99,7 @@ class ParserImpl implements Parser {
 		}
 
 		while (beginOfFunction != 0 && line.getAt(beginOfFunction - 1) != ' ') {
-			-- beginOfFunction;
+			--beginOfFunction;
 		}
 
 
@@ -147,12 +156,12 @@ class ParserImpl implements Parser {
 		StringBuilder currentArgument = new StringBuilder();
 		for (char character : line) {
 			if (character == '(') {
-				++ currentBracketStand;
+				++currentBracketStand;
 				currentArgument.append(character);
 			} else if (character == ')') {
-				-- currentBracketStand;
+				--currentBracketStand;
 				currentArgument.append(character);
-				if(currentBracketStand == 0) {
+				if (currentBracketStand == 0) {
 					line.remove(0, currentArgument.length() - 1);
 					return currentArgument.toString();
 				}
@@ -166,7 +175,7 @@ class ParserImpl implements Parser {
 	private String[] spliceAllFunction(Line line) {
 		List<String> results = new ArrayList<>();
 
-		while(containsFunction(line.toString())) {
+		while (containsFunction(line.toString())) {
 			results.add(spliceNextFunction(line));
 		}
 
@@ -177,7 +186,7 @@ class ParserImpl implements Parser {
 		List<String> results = new ArrayList<>();
 
 		StringBuilder currentArgument = new StringBuilder();
-		while(!line.isEmpty()) {
+		while (!line.isEmpty()) {
 			if (startsWithFunction(line.toString())) {
 				results.add(spliceNextFunction(line));
 			} else if (line.startsWith(",") || line.startsWith(" ")) {
@@ -200,7 +209,7 @@ class ParserImpl implements Parser {
 	}
 
 	private boolean isFunction(Line line) {
-		if (! line.matches("[a-zA-Z0-9_][a-zA-Z0-9_-]+\\(.*")) {
+		if (!line.matches("[a-zA-Z0-9_][a-zA-Z0-9_-]+\\(.*")) {
 			return false;
 		}
 
@@ -208,7 +217,7 @@ class ParserImpl implements Parser {
 		int bracketCount = 0;
 		for (char currentChar : line) {
 			if (currentChar == ')') {
-				-- bracketCount;
+				--bracketCount;
 				if (bracketCount == 0) {
 					foundLastClosingBracket = true;
 				}
@@ -222,7 +231,7 @@ class ParserImpl implements Parser {
 				if (foundLastClosingBracket) {
 					return false;
 				} else {
-					++ bracketCount;
+					++bracketCount;
 				}
 			} else if (foundLastClosingBracket && currentChar != ' ') {
 				// We already found the end of our function
@@ -246,12 +255,12 @@ class ParserImpl implements Parser {
 		return toCheck.matches(".*[a-zA-Z0-9_][a-zA-Z0-9_-]+[ ]*\\(.*\\).*");
 	}
 
-	private void preEvaluation(Collection<Line> lines) {
-		for(Line line : lines) {
+	private void preEvaluation(LineParser lines) {
+		for (Line line : lines) {
 			int relation = relationOpenClosed(line);
-			if(relation > 0) {
+			if (relation > 0) {
 				error("Missing closing bracket(s): " + relation, line.getLineNumber());
-			} else if(relation < 0) {
+			} else if (relation < 0) {
 				error("To many closing bracket(s): " + -relation, line.getLineNumber());
 			}
 		}
@@ -284,19 +293,13 @@ class ParserImpl implements Parser {
 		return line.countCharInLine('(') - line.countCharInLine(')');
 	}
 
-	private void checkForError(List<Line> lines) throws ParsingFailedException {
-		if (! running.get()) {
-			throw new ParsingFailedException("Stopped while parsing Script!\n" + errorMessage + "\n> (" + linePointer.get() + "): " + lines.get(linePointer.get()));
+	private void checkForError() throws ParsingFailedException {
+		if (!running.get()) {
+			String message = "Stopped while parsing Script!\n" + errorMessages + "\n> (" + lineParser.getLinePointer() + "): " + lineParser.getCurrent();
+			DiagnosticManager diagnosticManager = diagnosticManagerReference.get();
+			diagnosticManager.onError(message, lineParser.getCurrent());
+			throw new ParsingFailedException(message);
 		}
-	}
-
-	private int getCurrentLine() {
-		if(linePointerFreeze.get()) {
-			linePointerFreeze.set(false);
-			return linePointer.get();
-		}
-
-		return linePointer.incrementAndGet();
 	}
 
 	@Override
@@ -307,37 +310,33 @@ class ParserImpl implements Parser {
 	@Override
 	public synchronized Script parse(LineProvider lineProvider) throws ParsingFailedException {
 		running.set(true);
-		linePointerFreeze.set(false);
-		List<Line> lines = lineProvider.provide();
-		preEvaluation(lines);
+		synchronized (lineParser) {
+			lineParser.setLines(lineProvider);
+		}
+		preEvaluation(lineParser);
 		// We check here, to ensure basic
 		// stuff works (i.e. every \\( is
 		// closed within the same line)
 		// This might be changed, to account
 		// for multi-line brackets,
 		// but it is way easier that way
-		checkForError(lines);
+		checkForError();
 		ScriptImpl result;
-		linePointer.set(0);
 
 		try {
 			functionsLock.lock();
 			ruleLock.lock();
-			for (int currentLine = 0; currentLine < lines.size(); ) {
-				Line line = lines.get(currentLine).duplicate();
-				boolean workedOn = true;
-				while (! line.isEmpty() && workedOn) {
-					workedOn = false;
-					try {
-						if (containsFunction(line.toString())) {
-							applyFunctions(line);
-							workedOn = true;
-						}
-						applyRules(line, created);
-					} catch (Exception e) {
-						throw new ParsingFailedException("Encountered Exception while parsing!", e);
+			while(lineParser.hasNext()) {
+				Line line = lineParser.getNext().duplicate();
+				try {
+					if(containsFunction(line.toString())) {
+						applyFunctions(line);
 					}
+					applyRules(line, created);
+				} catch (Exception e) {
+					throw new ParsingFailedException("Encountered unexpected Exception while parsing!", e);
 				}
+
 
 				// If an error occurs, we
 				// want to detect it as early
@@ -348,8 +347,7 @@ class ParserImpl implements Parser {
 				// Therefor we check every time
 				// if an error occurred. Just
 				// then we increase the line counter
-				checkForError(lines);
-				currentLine = getCurrentLine();
+				checkForError();
 			}
 
 			// Here we assume, we parsed
@@ -359,7 +357,7 @@ class ParserImpl implements Parser {
 			// the last line, we have to
 			// check again, if we
 			// terminated ahead of time.
-			checkForError(lines);
+			checkForError();
 		} finally {
 			functionsLock.unlock();
 			ruleLock.unlock();
@@ -368,7 +366,6 @@ class ParserImpl implements Parser {
 				result = new ScriptImpl(created);
 				created.clear();
 				currentFunctionCount = 0;
-				linePointer.set(0);
 			}
 			running.set(false);
 		}
@@ -377,14 +374,18 @@ class ParserImpl implements Parser {
 	}
 
 	@Override
+	public Register getParserRegister() {
+		return internalVariables;
+	}
+
+	@Override
 	public void freezeLinePointer() {
-		linePointerFreeze.set(true);
+		lineParser.freezeLinePointer();
 	}
 
 	@Override
 	public void setLinePointer(int to) {
-		this.linePointer.set(to);
-		this.linePointerFreeze.set(true);
+		lineParser.setLinePointer(to);
 	}
 
 	@Override
@@ -400,13 +401,35 @@ class ParserImpl implements Parser {
 	@Override
 	public void error(String message, int lineNumber) {
 		running.set(false);
-		linePointer.set(lineNumber);
-		errorMessage = "error " + message;
+		lineParser.setLinePointer(lineNumber);
+		errorMessages.add(message);
 	}
 
 	@Override
 	public void error(final String message) {
-		error(message, linePointer.get());
+		error(message, lineParser.getLinePointer());
+	}
+
+	@Override
+	public void warn(String message, int lineNumber) {
+		Line line = lineParser.getLine(lineNumber);
+		diagnosticManagerReference.get().onWarning(message, line);
+	}
+
+	@Override
+	public void warn(String message) {
+		warn(message, lineParser.getLinePointer());
+	}
+
+	@Override
+	public void notice(String message, int lineNumber) {
+		Line line = lineParser.getLine(lineNumber);
+		diagnosticManagerReference.get().onNotice(message, line);
+	}
+
+	@Override
+	public void notice(String message) {
+		notice(message, lineParser.getLinePointer());
 	}
 
 	@Override
@@ -415,7 +438,7 @@ class ParserImpl implements Parser {
 	}
 
 	@Override
-	public void insert(Consumer<Register> consumer) {
+	public void insert(ScriptElement<Register> consumer) {
 		created.add(consumer);
 	}
 
@@ -446,12 +469,25 @@ class ParserImpl implements Parser {
 
 	@Override
 	public void add(Package newPackage) {
-		for(Rule rule : newPackage.getRules()) {
+		for (Rule rule : newPackage.getRules()) {
 			add(rule);
 		}
 
-		for(Function function : newPackage.getFunctions()) {
+		for (Function function : newPackage.getFunctions()) {
 			add(function);
+		}
+	}
+
+	@Override
+	public void addParsingFailedHandler(Consumer<ParsingFailedException> consumer) {
+		errorPipeline.addFirst(consumer);
+	}
+
+	@Override
+	public void setDiagnosticManager(DiagnosticManager diagnosticManager) {
+		Objects.requireNonNull(diagnosticManager);
+		synchronized (this.diagnosticManagerReference) {
+			this.diagnosticManagerReference.set(diagnosticManager);
 		}
 	}
 
@@ -460,7 +496,6 @@ class ParserImpl implements Parser {
 		return "Parser{" +
 				"rules=" + rules +
 				", internalVariables=" + internalVariables +
-				", linePointer=" + linePointer +
 				", running=" + running +
 				'}';
 	}
