@@ -2,8 +2,6 @@ package com.github.thorbenkuck.scripting.system;
 
 import com.github.thorbenkuck.scripting.*;
 
-import java.util.function.Consumer;
-
 public class DeleteRule implements Rule {
 	@Override
 	public boolean applies(Line line) {
@@ -12,7 +10,7 @@ public class DeleteRule implements Rule {
 
 	@Override
 	public ScriptElement<Register> apply(Line line, Parser parser, int linePointer) {
-		String name = line.subpart(line.lastIndexOf(" ") + 1).toString();
+		String name = line.subPart(line.lastIndexOf(" ") + 1).toString();
 		return new ScriptElement<Register>() {
 			@Override
 			public void accept(Register register) {

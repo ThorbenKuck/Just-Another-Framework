@@ -5,6 +5,12 @@ import com.github.thorbenkuck.scripting.Rule;
 
 public interface PackageBuilder {
 
+	/**
+	 * @return a new PackageBuilder
+	 * @see Package#build()
+	 * @deprecated This method is not as well worded as the current use! Use {@link Package#build()}
+	 */
+	@Deprecated
 	static PackageBuilder get() {
 		return new PackageFactory();
 	}

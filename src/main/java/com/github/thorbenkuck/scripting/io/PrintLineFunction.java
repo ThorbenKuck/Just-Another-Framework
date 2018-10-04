@@ -2,7 +2,6 @@ package com.github.thorbenkuck.scripting.io;
 
 import com.github.thorbenkuck.scripting.Function;
 import com.github.thorbenkuck.scripting.Register;
-import com.github.thorbenkuck.scripting.Utility;
 
 import java.io.PrintStream;
 
@@ -20,6 +19,9 @@ public class PrintLineFunction implements Function {
 
 	@Override
 	public String calculate(String[] args, Register register) {
+		if (out == null) {
+			return NO_RETURN_VALUE;
+		}
 		if(args.length == 0) {
 			IOUtils.printAccordingToType("", register, out, "\n");
 			return NO_RETURN_VALUE;

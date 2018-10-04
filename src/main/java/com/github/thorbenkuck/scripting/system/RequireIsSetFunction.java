@@ -2,7 +2,7 @@ package com.github.thorbenkuck.scripting.system;
 
 import com.github.thorbenkuck.scripting.Function;
 import com.github.thorbenkuck.scripting.Register;
-import com.github.thorbenkuck.scripting.exceptions.ExecutionRuntimeException;
+import com.github.thorbenkuck.scripting.exceptions.RuntimeExecutionException;
 
 public class RequireIsSetFunction implements Function {
 	@Override
@@ -14,7 +14,7 @@ public class RequireIsSetFunction implements Function {
 	public String calculate(String[] args, Register register) {
 		for(String arg : args) {
 			if(register.get(arg).equals(Register.NULL_VALUE)) {
-				throw new ExecutionRuntimeException("The value of " + arg + " is never set!");
+				throw new RuntimeExecutionException("The value of " + arg + " is never set!");
 			}
 		}
 		return NO_RETURN_VALUE;

@@ -1,16 +1,16 @@
 package com.github.thorbenkuck.scripting.test;
 
-import com.github.thorbenkuck.scripting.*;
+import com.github.thorbenkuck.scripting.Parser;
+import com.github.thorbenkuck.scripting.Script;
 import com.github.thorbenkuck.scripting.exceptions.ExecutionFailedException;
 import com.github.thorbenkuck.scripting.exceptions.ParsingFailedException;
 import com.github.thorbenkuck.scripting.io.IOModule;
 import com.github.thorbenkuck.scripting.math.MathModule;
 import com.github.thorbenkuck.scripting.packages.Package;
-import com.github.thorbenkuck.scripting.packages.PackageBuilder;
 import com.github.thorbenkuck.scripting.system.SystemModule;
 
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 public class ScriptingTest {
 
@@ -48,7 +48,7 @@ public class ScriptingTest {
 	public static void main(String[] args) {
 		Parser parser = Parser.create();
 
-		Package foundation = PackageBuilder.get()
+		Package foundation = Package.build()
 				.add(IOModule.getPackage())
 				.add(SystemModule.getPackage())
 				.add(MathModule.getPackage())

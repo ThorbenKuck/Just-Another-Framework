@@ -7,7 +7,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 class DefaultLineParser implements LineParser {
 
 	private final List<Line> lines = new ArrayList<>();
-	private final AtomicInteger linePointer = new AtomicInteger(0);
+	// This should be -1 to
+	// compensate the first
+	// line we read. By starting
+	// with -1, we increase to 0
+	// within the first line.
+	private final AtomicInteger linePointer = new AtomicInteger(-1);
 	private final AtomicBoolean linePointerFreeze = new AtomicBoolean(false);
 
 	DefaultLineParser() {

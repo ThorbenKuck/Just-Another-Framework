@@ -26,9 +26,9 @@ public interface Line extends Iterable<Character> {
 
 	String toReadable();
 
-	Line subpart(int begin);
+	Line subPart(int begin);
 
-	Line subpart(int begin, int end);
+	Line subPart(int begin, int end);
 
 	int indexOf(String s);
 

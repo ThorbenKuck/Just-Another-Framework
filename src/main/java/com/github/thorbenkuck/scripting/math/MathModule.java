@@ -2,7 +2,6 @@ package com.github.thorbenkuck.scripting.math;
 
 import com.github.thorbenkuck.scripting.Parser;
 import com.github.thorbenkuck.scripting.packages.Package;
-import com.github.thorbenkuck.scripting.packages.PackageBuilder;
 
 public class MathModule {
 
@@ -11,7 +10,7 @@ public class MathModule {
 	}
 
 	public static Package getPackage() {
-		return PackageBuilder.get()
+		return Package.build()
 				.add(new AddFunction())
 				.add(new SubtractFunction())
 				.add(new PowerFunction())

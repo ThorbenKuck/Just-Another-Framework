@@ -2,10 +2,11 @@ package com.github.thorbenkuck.scripting;
 
 import com.github.thorbenkuck.scripting.exceptions.ExecutionFailedException;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.function.Consumer;
 
-public interface Script {
+public interface Script extends Serializable {
 	void addInstruction(ScriptElement<Register> instruction);
 
 	void run(Map<String, String> registerValues) throws ExecutionFailedException;
@@ -17,6 +18,8 @@ public interface Script {
 	int countInstructions();
 
 	void setName(String string);
+
+	LocalDateTime getTimeOfCreation();
 
 	String getName();
 }

@@ -1,8 +1,9 @@
 package com.github.thorbenkuck.scripting;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public interface Register {
+public interface Register extends Serializable {
 
 	static Register create() {
 		return new MappingRegister();

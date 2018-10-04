@@ -2,8 +2,8 @@ package com.github.thorbenkuck.scripting.test;
 
 import com.github.thorbenkuck.scripting.*;
 import com.github.thorbenkuck.scripting.exceptions.ExecutionFailedException;
-import com.github.thorbenkuck.scripting.exceptions.ExecutionRuntimeException;
 import com.github.thorbenkuck.scripting.exceptions.ParsingFailedException;
+import com.github.thorbenkuck.scripting.exceptions.RuntimeExecutionException;
 import com.github.thorbenkuck.scripting.math.MathModule;
 import com.github.thorbenkuck.scripting.system.VariableDefinitionRule;
 import com.github.thorbenkuck.scripting.system.VariableInitializerRule;
@@ -61,7 +61,7 @@ public class GithubExample {
 		@Override
 		public String calculate(final String[] args, final Register register) {
 			if (! Utility.isDouble(args[0], register)) {
-				throw new ExecutionRuntimeException("Given " + Arrays.toString(args));
+				throw new RuntimeExecutionException("Given " + Arrays.toString(args));
 			}
 			String value = args[0];
 

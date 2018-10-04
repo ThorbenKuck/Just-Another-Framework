@@ -6,6 +6,11 @@ import com.github.thorbenkuck.scripting.Rule;
 import java.util.Collection;
 
 public interface Package {
+
+	static PackageBuilder build() {
+		return new PackageFactory();
+	}
+
 	Collection<Function> getFunctions();
 
 	Collection<Rule> getRules();

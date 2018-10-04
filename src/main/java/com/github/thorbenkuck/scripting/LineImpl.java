@@ -81,12 +81,12 @@ class LineImpl implements Line {
 	}
 
 	@Override
-	public Line subpart(int begin) {
-		return subpart(begin, content.length());
+	public Line subPart(int begin) {
+		return subPart(begin, content.length());
 	}
 
 	@Override
-	public Line subpart(int begin, int end) {
+	public Line subPart(int begin, int end) {
 		return new LineImpl(content.substring(begin, end), lineNumber);
 	}
 

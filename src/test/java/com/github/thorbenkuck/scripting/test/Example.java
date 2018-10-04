@@ -7,8 +7,9 @@ import com.github.thorbenkuck.scripting.exceptions.ParsingFailedException;
 import com.github.thorbenkuck.scripting.io.IOModule;
 import com.github.thorbenkuck.scripting.math.MathModule;
 import com.github.thorbenkuck.scripting.packages.Package;
-import com.github.thorbenkuck.scripting.packages.PackageBuilder;
 import com.github.thorbenkuck.scripting.system.SystemModule;
+
+import javax.script.ScriptEngineManager;
 
 // This is the Example from the Readme, made executable
 public class Example {
@@ -74,11 +75,13 @@ public class Example {
 		// you will get an error, because the
 		// PackageBuilder returns the wrong type
 		// of package.
-		Package foundation = PackageBuilder.get()
+		Package foundation = Package.build()
 				.add(IOModule.getPackage())
 				.add(SystemModule.getPackage())
 				.add(MathModule.getPackage())
 				.create();
+
+		ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 
 		parser.add(foundation);
 
@@ -95,7 +98,7 @@ public class Example {
 		System.out.println("script parsed!");
 
 		// Prints every step the script is going to take
-		// If the Output is to much for you, simply delte
+		// If the Output is to much for you, simply delete
 		// this following 3 lines.
 		System.out.println();
 		System.out.println(script);

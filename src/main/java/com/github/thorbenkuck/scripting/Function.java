@@ -1,5 +1,7 @@
 package com.github.thorbenkuck.scripting;
 
+import com.github.thorbenkuck.scripting.exceptions.RuntimeExecutionException;
+
 public interface Function {
 
 	String NO_RETURN_VALUE = "void";
@@ -12,7 +14,7 @@ public interface Function {
 
 	String getFunctionName();
 
-	String calculate(String[] args, Register register);
+	String calculate(String[] args, Register register) throws RuntimeExecutionException;
 
 	default void onParse(String[] args, Parser parser, int lineNumber) {
 	}

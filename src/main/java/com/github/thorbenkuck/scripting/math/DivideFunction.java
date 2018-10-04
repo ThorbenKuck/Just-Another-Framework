@@ -4,7 +4,7 @@ import com.github.thorbenkuck.scripting.Function;
 import com.github.thorbenkuck.scripting.Parser;
 import com.github.thorbenkuck.scripting.Register;
 import com.github.thorbenkuck.scripting.Utility;
-import com.github.thorbenkuck.scripting.exceptions.ExecutionRuntimeException;
+import com.github.thorbenkuck.scripting.exceptions.RuntimeExecutionException;
 
 import java.util.Arrays;
 
@@ -22,7 +22,7 @@ public class DivideFunction implements Function {
 		} else if(Utility.isInteger(args[0]) && Utility.isInteger(args[1])) {
 			return fromInt(args, register);
 		}
-		throw new ExecutionRuntimeException("Unknown provided types: " + Arrays.asList(args));
+		throw new RuntimeExecutionException("Unknown provided types: " + Arrays.asList(args));
 	}
 
 	private String fromInt(final String[] args, final Register register) {

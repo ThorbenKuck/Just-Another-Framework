@@ -1,7 +1,9 @@
 package com.github.thorbenkuck.scripting;
 
+import java.io.Serializable;
+
 @FunctionalInterface
-public interface ScriptElement<T> {
+public interface ScriptElement<T> extends Serializable {
 
 	/**
 	 * Performs this operation on the given argument.
@@ -9,12 +11,4 @@ public interface ScriptElement<T> {
 	 * @param t the input argument
 	 */
 	void accept(T t);
-
-	default String serialize() {
-		throw new UnsupportedOperationException("Serialization");
-	}
-
-	default String deserialize() {
-		throw new UnsupportedOperationException("Deserialization");
-	}
 }

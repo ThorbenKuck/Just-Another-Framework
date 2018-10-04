@@ -2,8 +2,6 @@ package com.github.thorbenkuck.scripting.system;
 
 import com.github.thorbenkuck.scripting.*;
 
-import java.util.function.Consumer;
-
 public class LoopStartRule implements Rule {
 
 	@Override
@@ -15,18 +13,19 @@ public class LoopStartRule implements Rule {
 		stringBuilder.delete(0, name.length() + 1);
 		String initial = stringBuilder.substring(0, withoutIdentifier.indexOf(" "));
 		stringBuilder.delete(0, name.length() + 1);
-		String finale = stringBuilder.substring(0, withoutIdentifier.indexOf(" "));
+		String finale = stringBuilder.substring(0, stringBuilder.toString().length());
 		stringBuilder.delete(0, name.length() + 1);
-		if (!Register.NULL_VALUE.equals(parser.getInternalVariable(name))) {
-			int value = Integer.parseInt(parser.getInternalVariable(name));
+		Register parserRegister = parser.getParserRegister();
+		if (!Register.NULL_VALUE.equals(parserRegister.get(name))) {
+			int value = Integer.parseInt(parserRegister.get(name));
 			++value;
 			String stringedValue = String.valueOf(value);
 			int finalValue = Integer.parseInt(finale);
 			if (value > finalValue) {
-				parser.setLinePointer(Integer.parseInt(parser.getInternalVariable("loopEnd" + name)));
+				parser.setLinePointer(Integer.parseInt(parserRegister.get("loopEnd" + name)));
 				parser.deleteInternalVariable(name);
-				parser.clearInternalVariable("loop" + name);
-				parser.clearInternalVariable("loopEnd" + name);
+				parserRegister.remove("loop" + name);
+				parserRegister.remove("loopEnd" + name);
 				return new ScriptElement<Register>() {
 					@Override
 					public void accept(Register register) {
@@ -39,7 +38,7 @@ public class LoopStartRule implements Rule {
 					}
 				};
 			} else {
-				parser.setInternalVariable(name, stringedValue);
+				parserRegister.put(name, stringedValue);
 				return new ScriptElement<Register>() {
 					@Override
 					public void accept(Register register) {
@@ -56,8 +55,8 @@ public class LoopStartRule implements Rule {
 				};
 			}
 		} else {
-			parser.setInternalVariable(name, initial);
-			parser.setInternalVariable("loop" + name, String.valueOf(linePointer - 1));
+			parserRegister.put(name, initial);
+			parserRegister.put("loop" + name, String.valueOf(linePointer - 1));
 			return new ScriptElement<Register>() {
 				@Override
 				public void accept(Register register) {

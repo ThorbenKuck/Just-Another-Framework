@@ -4,7 +4,7 @@ import com.github.thorbenkuck.scripting.Function;
 import com.github.thorbenkuck.scripting.Parser;
 import com.github.thorbenkuck.scripting.Register;
 import com.github.thorbenkuck.scripting.Utility;
-import com.github.thorbenkuck.scripting.exceptions.ExecutionRuntimeException;
+import com.github.thorbenkuck.scripting.exceptions.RuntimeExecutionException;
 
 import java.util.Arrays;
 
@@ -29,7 +29,7 @@ public class PowerFunction implements Function {
 			return String.valueOf(Math.pow(number, power));
 		}
 
-		throw new ExecutionRuntimeException(getFunctionName() + " requires 2 numbers. Given: " + Arrays.toString(args));
+		throw new RuntimeExecutionException(getFunctionName() + " requires 2 numbers. Given: " + Arrays.toString(args));
 	}
 
 	@Override

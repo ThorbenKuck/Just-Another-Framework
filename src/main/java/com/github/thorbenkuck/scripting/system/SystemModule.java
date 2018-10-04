@@ -2,7 +2,6 @@ package com.github.thorbenkuck.scripting.system;
 
 import com.github.thorbenkuck.scripting.Parser;
 import com.github.thorbenkuck.scripting.packages.Package;
-import com.github.thorbenkuck.scripting.packages.PackageBuilder;
 
 public class SystemModule {
 
@@ -11,7 +10,7 @@ public class SystemModule {
 	}
 
 	public static Package getPackage() {
-		return PackageBuilder.get()
+		return Package.build()
 				.add(new ConvertToIntegerFunction())
 				.add(new RequireIsSetFunction())
 				.add(new VariableInitializerRule())

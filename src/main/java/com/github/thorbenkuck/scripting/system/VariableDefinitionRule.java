@@ -1,9 +1,7 @@
 package com.github.thorbenkuck.scripting.system;
 
 import com.github.thorbenkuck.scripting.*;
-import com.github.thorbenkuck.scripting.exceptions.ExecutionRuntimeException;
-
-import java.util.function.Consumer;
+import com.github.thorbenkuck.scripting.exceptions.RuntimeExecutionException;
 
 public class VariableDefinitionRule implements Rule {
 
@@ -20,12 +18,12 @@ public class VariableDefinitionRule implements Rule {
 			@Override
 			public void accept(Register register) {
 				if(Register.NULL_VALUE.equals(register.get(name))) {
-					throw new ExecutionRuntimeException(name + " is not defined");
+					throw new RuntimeExecutionException(name + " is not defined");
 				} else {
 					if(Function.isVariable.apply(value, register)) {
 						String savedValue = register.get(value);
 						if(Register.NULL_VALUE.equals(savedValue)) {
-							throw new ExecutionRuntimeException("Tried to set null variable!");
+							throw new RuntimeExecutionException("Tried to set null variable!");
 						} else {
 							register.put(name, savedValue);
 						}

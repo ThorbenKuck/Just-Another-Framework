@@ -4,23 +4,16 @@ import com.github.thorbenkuck.scripting.exceptions.ExecutionFailedException;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Consumer;
 
 class ScriptImpl implements Script {
 
 	private final Queue<ScriptElement<Register>> core = new LinkedList<>();
 	private final Map<String, String> initialRegisterValues = new HashMap<>();
-	private String name = "Script(" + LocalDateTime.now() + ")";
+	private final LocalDateTime timeOfCreation = LocalDateTime.now();
+	private String name = "Script(" + timeOfCreation + ")";
 
 	ScriptImpl(Queue<ScriptElement<Register>> core) {
 		this.core.addAll(core);
-	}
-
-	void setInstructions(Collection<ScriptElement<Register>> consumer) {
-		synchronized (core) {
-			core.clear();
-			core.addAll(consumer);
-		}
 	}
 
 	@Override
@@ -94,6 +87,11 @@ class ScriptImpl implements Script {
 	@Override
 	public void setName(String string) {
 		this.name = string;
+	}
+
+	@Override
+	public LocalDateTime getTimeOfCreation() {
+		return timeOfCreation;
 	}
 
 	@Override

@@ -1,9 +1,7 @@
 package com.github.thorbenkuck.scripting.math;
 
 import com.github.thorbenkuck.scripting.*;
-import com.github.thorbenkuck.scripting.exceptions.ExecutionRuntimeException;
-
-import java.util.function.Consumer;
+import com.github.thorbenkuck.scripting.exceptions.RuntimeExecutionException;
 
 public class IncrementRule implements Rule {
 
@@ -14,12 +12,12 @@ public class IncrementRule implements Rule {
 
 	@Override
 	public ScriptElement<Register> apply(Line line, Parser parser, int linePointer) {
-		String reference = line.subpart(2, line.length()).toString();
+		String reference = line.subPart(2, line.length()).toString();
 		return new ScriptElement<Register>() {
 			@Override
 			public void accept(Register register) {
 				if(register.get(reference).equals(Register.NULL_VALUE)) {
-					throw new ExecutionRuntimeException("Increment is only applicable to variables");
+					throw new RuntimeExecutionException("Increment is only applicable to variables");
 				}
 				String currentValue = register.get(reference);
 				if(Utility.isInteger(currentValue)) {
@@ -31,7 +29,7 @@ public class IncrementRule implements Rule {
 					++value;
 					register.put(reference, String.valueOf(value));
 				} else {
-					throw new ExecutionRuntimeException("Unknown type of " + currentValue);
+					throw new RuntimeExecutionException("Unknown type of " + currentValue);
 				}
 			}
 

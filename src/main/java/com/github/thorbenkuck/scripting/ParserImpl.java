@@ -25,6 +25,7 @@ class ParserImpl implements Parser {
 	private final DefaultLineParser lineParser = new DefaultLineParser();
 	private static int currentFunctionCount = 0;
 	private final List<String> errorMessages = new ArrayList<>();
+	private final List<Integer> faultyLines = new ArrayList<>();
 
 	ParserImpl() {
 		this(DiagnosticManager.createDefault());
@@ -103,7 +104,7 @@ class ParserImpl implements Parser {
 		}
 
 
-		return line.subpart(beginOfFunction, lastIndex);
+		return line.subPart(beginOfFunction, lastIndex);
 	}
 
 	private String evaluateFunction(String functionName, String[] args, int lineNumber) {
@@ -295,10 +296,7 @@ class ParserImpl implements Parser {
 
 	private void checkForError() throws ParsingFailedException {
 		if (!running.get()) {
-			String message = "Stopped while parsing Script!\n" + errorMessages + "\n> (" + lineParser.getLinePointer() + "): " + lineParser.getCurrent();
-			DiagnosticManager diagnosticManager = diagnosticManagerReference.get();
-			diagnosticManager.onError(message, lineParser.getCurrent());
-			throw new ParsingFailedException(message);
+			throw new ParsingFailedException(faultyLines);
 		}
 	}
 
@@ -334,7 +332,7 @@ class ParserImpl implements Parser {
 					}
 					applyRules(line, created);
 				} catch (Exception e) {
-					throw new ParsingFailedException("Encountered unexpected Exception while parsing!", e);
+					throw new ParsingFailedException("Encountered unexpected Exception while parsing!", e, lineParser.getLinePointer());
 				}
 
 
@@ -401,8 +399,9 @@ class ParserImpl implements Parser {
 	@Override
 	public void error(String message, int lineNumber) {
 		running.set(false);
-		lineParser.setLinePointer(lineNumber);
+		faultyLines.add(lineNumber);
 		errorMessages.add(message);
+		diagnosticManagerReference.get().onError(message, lineParser.getLine(lineNumber));
 	}
 
 	@Override
