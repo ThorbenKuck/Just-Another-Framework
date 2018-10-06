@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.thorbenkuck</groupId>
     <artifactId>Scripting</artifactId>
-    <version>0.3</version>
+    <version>0.3.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Scripting</name>
     <description>Scripting engine</description>
@@ -17,7 +17,7 @@
         <connection>scm:git:git@github.com:ThorbenKuck/Scripting.git</connection>
         <url>scm:git:git@github.com:ThorbenKuck/Scripting.git</url>
         <developerConnection>scm:git:git@github.com:ThorbenKuck/Scripting.git</developerConnection>
-        <tag>Scripting-0.3</tag>
+        <tag>Scripting-0.1</tag>
     </scm>
 
     <developers>
