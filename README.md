@@ -6,7 +6,7 @@ A "simple" foundation to creating your own scripting Language.
 
 This Framework ist still in production! Use at your own Risk!
 
-This Framework also is NOT optimized! There is still some quirky Code inside! Do NOT judge the Framework by its current State!
+This Framework also is NOT optimized! There is still some quirky Code inside!
 
 ------ 
 
@@ -26,7 +26,7 @@ Just add this dependency to your pom.xml
 <dependency>
     <groupId>com.github.thorbenkuck</groupId>
     <artifactId>Scripting</artifactId>
-    <version>0.2</version>
+    <version>0.3</version>
 </dependency>
 ```
 
@@ -35,7 +35,7 @@ Just add this dependency to your pom.xml
 Just add this dependency to your dependency part in build.gradle
 
 ```
-compile group: 'com.github.thorbenkuck', name: 'Scripting', version: '0.2'
+compile group: 'com.github.thorbenkuck', name: 'Scripting', version: '0.3'
 ```
 
 ------
@@ -111,9 +111,8 @@ public class Example {
         // package, which is part of java.lang.
         // This means, if you import nothing,
         // you will get an error, because the
-        // PackageBuilder returns the wrong type
-        // of package.
-        Package foundation = PackageBuilder.get()
+        // build method is not present
+        Package foundation = Package.build()
                 .add(IOModule.getPackage())
                 .add(SystemModule.getPackage())
                 .add(MathModule.getPackage())
@@ -211,8 +210,8 @@ String toEvaluate = "var x = 1;"
 
 Parser parser = Parser.create();
 
-Rule.applyDefault(parser);
-Function.applyDefault(parser);
+parser.add(new PrintLineFunction());
+parser.add(new AddFunction());
 
 Script script;
 try {
