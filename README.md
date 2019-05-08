@@ -1,4 +1,4 @@
-A "simple" foundation to creating your own, domain specific scripting language, ready to be integrated into your database.
+A "simple" foundation for creating your own, domain specific scripting language, ready to be integrated into your database.
 
 If you dreamed about creating your own (domain specific) language, JAF provides you with an easy to learn foundation and a (WIP) documentation to get you off to a good start.
 
