@@ -1,6 +1,14 @@
-A "simple" foundation for creating your own, domain specific scripting language, ready to be integrated into your database.
+# Just another framework
 
-If you dreamed about creating your own (domain specific) language, JAF provides you with an easy to learn foundation and a (WIP) documentation to get you off to a good start.
+> "Wow, look at this. I just scrolled through pages and pages of frameworks and every thing looks the same. Oh. Wow. Look. Just another framework."
+
+This is not your typical framework, that strives to implement new and exiting technologies in a new and exiting way to push the ego of the one developing it. It is designed only to give you a basis, so that you may enhance your project with **your own** language. Sprung out of passion and the desire for "creating my own programming language".
+
+It is a "simple" foundation for creating your own (domain specific) scripting language. Nothing more than an aggregate. Taking **your** function and **your** rules and applying it to **your** custom code. No parsing logic, no juggling with types and instances, just functions, rules and a parser.
+
+If you dreamed about creating your own (domain specific) language, which hooks to java, is build on java and basically translates to java, JAF provides you with an easy to learn foundation and a (WIP) documentation to get you off to a good start.
+
+If you want to use a scripting language, do **NOT** use JAF! This frameworks will help you, creating and designing your own language, not just "introduce a scripting language into your project".
 
 ------
 
