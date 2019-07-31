@@ -24,12 +24,12 @@ public class LoopStartRule implements Rule {
 			if (value > finalValue) {
 				parser.setLinePointer(Integer.parseInt(parserRegister.get("loopEnd" + name)));
 				parser.deleteInternalVariable(name);
-				parserRegister.remove("loop" + name);
-				parserRegister.remove("loopEnd" + name);
+				parserRegister.clear("loop" + name);
+				parserRegister.clear("loopEnd" + name);
 				return new ScriptElement<Register>() {
 					@Override
 					public void accept(Register register) {
-						register.remove(name);
+						register.clear(name);
 					}
 
 					@Override

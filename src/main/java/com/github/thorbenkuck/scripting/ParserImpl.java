@@ -433,7 +433,7 @@ class ParserImpl implements Parser {
 
 	@Override
 	public void clearInternalVariable(String name) {
-		internalVariables.remove(name);
+		internalVariables.clear(name);
 	}
 
 	@Override
@@ -443,7 +443,7 @@ class ParserImpl implements Parser {
 
 	@Override
 	public void deleteInternalVariable(String name) {
-		internalVariables.remove(name);
+		internalVariables.clear(name);
 	}
 
 	@Override

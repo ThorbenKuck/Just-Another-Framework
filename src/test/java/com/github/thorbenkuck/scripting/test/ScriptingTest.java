@@ -38,11 +38,11 @@ public class ScriptingTest {
 					"endLoop i;" +
 					"println(\"x should still be what you selected: \", x);" +
 					"println(\"i=\", i);" +
-					"print(\"j=\", j);" +
+					"println(\"j=\", j);" +
 					"var z;" +
 					"println(\"z=\", z);" +
 					"delete z;" +
-					"println(\"z=\");" +
+					"println(\"z=\", z);" +
 					"println(\"END\");";
 
 	public static void main(String[] args) {

@@ -15,7 +15,7 @@ public class DeleteRule implements Rule {
 			@Override
 			public void accept(Register register) {
 				// Blindly remove it
-				register.remove(name);
+				register.clear(name);
 			}
 
 			@Override

@@ -11,11 +11,21 @@ public interface Register extends Serializable {
 
 	String NULL_VALUE = "null";
 
+	Byte[] NULL_BYTES = new Byte[0];
+
 	void put(String key, String value);
+
+	void put(Byte key, Byte value);
+
+	void put(Byte key, Byte[] value);
 
 	String get(String key);
 
-	void remove(String name);
+	Byte[] get(Byte key);
+
+	void clear(String name);
+
+	void clear(Byte key);
 
 	void clear();
 
