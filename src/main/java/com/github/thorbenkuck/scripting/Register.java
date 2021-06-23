@@ -9,6 +9,10 @@ public interface Register extends Serializable {
 		return new MappingRegister();
 	}
 
+	static Register create(Map<String, String> values) {
+		return new MappingRegister(values);
+	}
+
 	String NULL_VALUE = "null";
 
 	void put(String key, String value);

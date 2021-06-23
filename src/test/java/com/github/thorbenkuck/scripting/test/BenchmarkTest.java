@@ -14,13 +14,7 @@ import com.github.thorbenkuck.scripting.system.VariableInitializerRule;
 
 public class BenchmarkTest {
 
-	public static void main(String[] args) {
-		String rawScript = "var x = 4;" +
-				"loop i 1:10000;" +
-				"    ++x;" +
-				"endLoop i;" +
-				"println(\"x=\", x)";
-
+	public static void singleRun(String rawScript) {
 		Package foundation = Package.build()
 				.add(new LoopStartRule())
 				.add(new LoopEndRule())
@@ -55,6 +49,79 @@ public class BenchmarkTest {
 
 			try {
 				script.run();
+			} catch (ExecutionFailedException e) {
+				e.printStackTrace();
+			}
+			long timeTakenScriptExecution = System.currentTimeMillis() - startScriptExecution;
+
+			long startJavaExecution = System.currentTimeMillis();
+
+			int x = 4;
+
+			for (int i = 1; i <= 10000; i++) {
+				++x;
+			}
+
+//			System.out.println("x = " + x);
+
+			long timeTakenJavaExecution = System.currentTimeMillis() - startJavaExecution;
+
+			System.out.println("| " + timeTakenCreation + " millis | " + timeTakenScriptExecution + " millis | " + timeTakenJavaExecution + " millis |");
+
+			++counter;
+		}
+	}
+
+	public static void main(String[] args) {
+		String rawScript = "var x = 4;" +
+				"loop i 1:10000;" +
+				"    ++x;" +
+				"endLoop i;" +
+				"println(\"x=\", x)";
+
+		singleRun(rawScript);
+//		multiRun(rawScript);
+	}
+
+	public static void multiRun(String rawScript) {
+
+		Package foundation = Package.build()
+				.add(new LoopStartRule())
+				.add(new LoopEndRule())
+				.add(new IncrementRule())
+				.add(new VariableInitializerRule())
+				.add(new VariableDefinitionRule())
+				.add(new PrintLineFunction(null))
+				.create();
+
+		int counter = 0;
+
+		System.out.println("\n\n## MULTI RUN ##\n");
+		System.out.println("| Script-Creation | Script-Execution | Java-Execution |\n" +
+				"| :-------------: | :--------------: | :------------: |");
+
+		while (counter < 50) {
+
+			Script script;
+			Parser parser = Parser.create();
+
+			parser.add(foundation);
+
+			long startCreation = System.currentTimeMillis();
+			try {
+				script = parser.parse(rawScript);
+			} catch (ParsingFailedException e) {
+				e.printStackTrace();
+				return;
+			}
+			long timeTakenCreation = System.currentTimeMillis() - startCreation;
+
+			long startScriptExecution = System.currentTimeMillis();
+
+			try {
+				for (int i = 1; i <= 10000; i++) {
+					script.run();
+				}
 			} catch (ExecutionFailedException e) {
 				e.printStackTrace();
 			}

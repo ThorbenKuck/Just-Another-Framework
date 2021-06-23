@@ -23,17 +23,7 @@ class ScriptImpl implements Script {
 		}
 	}
 
-	@Override
-	public void run(Map<String, String> registerValues) throws ExecutionFailedException {
-		synchronized (initialRegisterValues) {
-			initialRegisterValues.putAll(registerValues);
-		}
-		run();
-	}
-
-	@Override
-	public void run() throws ExecutionFailedException {
-		final Register register = Register.create();
+	private void doRun(Register register) throws ExecutionFailedException {
 		synchronized (initialRegisterValues) {
 			register.adapt(initialRegisterValues);
 		}
@@ -52,6 +42,16 @@ class ScriptImpl implements Script {
 		} finally {
 			register.clear();
 		}
+	}
+
+	@Override
+	public void run(Map<String, String> registerValues) throws ExecutionFailedException {
+		doRun(Register.create(registerValues));
+	}
+
+	@Override
+	public void run() throws ExecutionFailedException {
+		doRun(Register.create());
 	}
 
 	@Override

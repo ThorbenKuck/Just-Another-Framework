@@ -1,6 +1,15 @@
 package com.github.thorbenkuck.scripting;
 
+import java.io.PrintStream;
+
 class DefaultDiagnosticManager implements DiagnosticManager {
+
+	private final PrintStream printStream;
+
+	DefaultDiagnosticManager(PrintStream printStream) {
+		this.printStream = printStream;
+	}
+
 	@Override
 	public void onError(String message, Line line) {
 		print("[error]", message, line);
@@ -17,7 +26,7 @@ class DefaultDiagnosticManager implements DiagnosticManager {
 	}
 
 	private void print(String prefix, String message, Line line) {
-		System.out.println(prefix + " > " + line.getLineNumber() + ": " + message);
-		System.out.println(line.toReadable());
+		printStream.println(prefix + " > " + line.getLineNumber() + ": " + message);
+		printStream.println(line.toReadable());
 	}
 }

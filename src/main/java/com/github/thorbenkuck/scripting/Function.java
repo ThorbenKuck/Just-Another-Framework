@@ -2,22 +2,18 @@ package com.github.thorbenkuck.scripting;
 
 import com.github.thorbenkuck.scripting.exceptions.RuntimeExecutionException;
 
-public interface Function {
+public interface Function extends VariableEvaluation {
 
-	String NO_RETURN_VALUE = "void";
+    String NO_RETURN_VALUE = "void";
 
-	java.util.function.Function<String, String> asStringValue = string -> "\"" + string + "\"";
+    String getFunctionName();
 
-	java.util.function.Function<String, Boolean> isString = string -> string.startsWith("\"") && string.endsWith("\"");
+    String calculate(String[] args, Register register) throws RuntimeExecutionException;
 
-	java.util.function.BiFunction<String, Register, Boolean> isVariable = (string, register) -> ! isString.apply(string) && ! register.get(string).equals(Register.NULL_VALUE);
+    default void onParse(String[] args, Parser parser, int lineNumber) {
+    }
 
-	String getFunctionName();
-
-	String calculate(String[] args, Register register) throws RuntimeExecutionException;
-
-	default void onParse(String[] args, Parser parser, int lineNumber) {
-	}
-
-	default String hintReturnValue() { return ""; }
+    default String hintReturnValue() {
+        return "";
+    }
 }

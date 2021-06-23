@@ -5,7 +5,15 @@ import java.util.Map;
 
 class MappingRegister implements Register {
 
-	private final Map<String, String> core = new HashMap<>();
+	private final Map<String, String> core;
+
+	public MappingRegister(Map<String, String> values) {
+		this.core = new HashMap<>(values);
+	}
+
+	public MappingRegister() {
+		this(new HashMap<>());
+	}
 
 	@Override
 	public void put(String key, String value) {
@@ -14,7 +22,7 @@ class MappingRegister implements Register {
 
 	@Override
 	public String get(String key) {
-		if(Utility.isInteger(key)) {
+		if(VariableEvaluation.isAnInteger(key)) {
 			return key;
 		}
 		return core.getOrDefault(key, NULL_VALUE);
@@ -37,6 +45,6 @@ class MappingRegister implements Register {
 
 	@Override
 	public void adapt(Map<String, String> initialRegisterValues) {
-		core.putAll(initialRegisterValues);
+		initialRegisterValues.forEach(core::putIfAbsent);
 	}
 }

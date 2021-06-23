@@ -1,16 +1,13 @@
 package com.github.thorbenkuck.scripting.math;
 
-import com.github.thorbenkuck.scripting.Function;
-import com.github.thorbenkuck.scripting.Parser;
-import com.github.thorbenkuck.scripting.Register;
-import com.github.thorbenkuck.scripting.Utility;
+import com.github.thorbenkuck.scripting.*;
 
 public class SubtractFunction implements Function {
 
 	private String getValue(String s, Register register) {
-		if (isVariable.apply(s, register)) {
+		if (isVariable(s, register)) {
 			return register.get(s);
-		} else if (Utility.isInteger(s)) {
+		} else if (isInteger(s)) {
 			return s;
 		}
 
@@ -32,8 +29,8 @@ public class SubtractFunction implements Function {
 		// we subtract correctly.
 		int sum;
 		String value = getValue(args[0], register);
-		if (Utility.isInteger(value, register)) {
-			sum = Utility.toInt(value, register);
+		if (isInteger(value, register)) {
+			sum = toInt(value, register);
 		} else {
 			sum = 0;
 			System.out.println("Unknown type provided to subtract: " + value);
@@ -43,8 +40,8 @@ public class SubtractFunction implements Function {
 		for (String arg : args) {
 			value = getValue(arg, register);
 
-			if (Utility.isInteger(value, register)) {
-				sum -= Utility.toInt(value, register);
+			if (isInteger(value, register)) {
+				sum -= toInt(value, register);
 			} else {
 				System.out.println("Unknown type provided to subtract: " + arg);
 			}

@@ -16,8 +16,8 @@ public class AddFunction implements Function {
 	private String calculateDoubles(final String[] args, Register register) {
 		double count = 0;
 		for (String arg : args) {
-			if (Utility.isDouble(arg, register)) {
-				count += Utility.toDouble(arg, register);
+			if (isDouble(arg, register)) {
+				count += toDouble(arg, register);
 			} else {
 				System.out.println("Unknown type provided to add: " + arg);
 			}
@@ -29,7 +29,7 @@ public class AddFunction implements Function {
 	public String calculate(final String[] args, final Register register) {
 		boolean doubleValueContained = false;
 		for (String arg : args) {
-			if (Utility.isDouble(arg, register)) {
+			if (isDouble(arg, register)) {
 				doubleValueContained = true;
 				break;
 			}
@@ -46,8 +46,8 @@ public class AddFunction implements Function {
 	private String calculateInt(final String[] args, final Register register) {
 		int count = 0;
 		for (String arg : args) {
-			if (Utility.isInteger(arg, register)) {
-				count += Utility.toInt(arg, register);
+			if (isInteger(arg, register)) {
+				count += toInt(arg, register);
 			} else {
 				System.out.println("Unknown type provided to add: " + arg);
 			}

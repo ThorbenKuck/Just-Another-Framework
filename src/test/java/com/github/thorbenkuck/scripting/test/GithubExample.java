@@ -10,6 +10,7 @@ import com.github.thorbenkuck.scripting.system.VariableInitializerRule;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class GithubExample {
@@ -34,12 +35,9 @@ public class GithubExample {
 
 		try {
 			Script script = parser.parse(rawScript);
-			script.setValue("x", "1");
-			script.run();
-			script.setValue("x", "2");
-			script.run();
-			script.setValue("x", "3");
-			script.run();
+			script.run(Collections.singletonMap("x", "1"));
+			script.run(Collections.singletonMap("x", "2"));
+			script.run(Collections.singletonMap("x", "3"));
 		} catch (ParsingFailedException | ExecutionFailedException e) {
 			e.printStackTrace();
 		}
@@ -60,12 +58,12 @@ public class GithubExample {
 
 		@Override
 		public String calculate(final String[] args, final Register register) {
-			if (! Utility.isDouble(args[0], register)) {
+			if (! isDouble(args[0], register)) {
 				throw new RuntimeExecutionException("Given " + Arrays.toString(args));
 			}
 			String value = args[0];
 
-			results.add(Utility.toDouble(value, register));
+			results.add(toDouble(value, register));
 			System.out.println(results);
 
 			return NO_RETURN_VALUE;

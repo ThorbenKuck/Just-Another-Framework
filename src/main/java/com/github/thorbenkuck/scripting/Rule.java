@@ -1,6 +1,6 @@
 package com.github.thorbenkuck.scripting;
 
-public interface Rule {
+public interface Rule extends VariableEvaluation {
 
 	boolean applies(Line line);
 

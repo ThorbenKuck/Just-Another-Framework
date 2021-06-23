@@ -28,7 +28,7 @@ class ParserImpl implements Parser {
 	private final List<Integer> faultyLines = new ArrayList<>();
 
 	ParserImpl() {
-		this(DiagnosticManager.createDefault());
+		this(DiagnosticManager.systemErr());
 	}
 
 	ParserImpl(DiagnosticManager diagnosticManager) {

@@ -20,7 +20,7 @@ public class VariableDefinitionRule implements Rule {
 				if(Register.NULL_VALUE.equals(register.get(name))) {
 					throw new RuntimeExecutionException(name + " is not defined");
 				} else {
-					if(Function.isVariable.apply(value, register)) {
+					if(VariableEvaluation.isAVariable(value, register)) {
 						String savedValue = register.get(value);
 						if(Register.NULL_VALUE.equals(savedValue)) {
 							throw new RuntimeExecutionException("Tried to set null variable!");

@@ -20,12 +20,12 @@ public class DecrementRule implements Rule {
 					throw new RuntimeExecutionException("Decrement is only applicable to variables");
 				}
 				String currentValue = register.get(reference);
-				if(Utility.isInteger(currentValue)) {
-					int intValue = Utility.toInt(currentValue);
+				if(isInteger(currentValue)) {
+					int intValue = asInt(currentValue);
 					--intValue;
 					register.put(reference, String.valueOf(intValue));
-				} else if(Utility.isDouble(currentValue)) {
-					double value = Utility.toDouble(currentValue);
+				} else if(isDouble(currentValue)) {
+					double value = asDouble(currentValue);
 					--value;
 					register.put(reference, String.valueOf(value));
 				} else {

@@ -118,7 +118,7 @@ class DefaultLineParser implements LineParser {
 		return new LineIterator(lines);
 	}
 
-	private final class LineIterator implements Iterator<Line> {
+	private static final class LineIterator implements Iterator<Line> {
 
 		private final Queue<Line> lines;
 

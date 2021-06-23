@@ -18,7 +18,7 @@ public class ConvertToIntegerFunction implements Function {
 			if(value.equals(Register.NULL_VALUE)) {
 				continue;
 			}
-			if(! Utility.isInteger(value)) {
+			if(! isInteger(value)) {
 				register.put(arg, "0");
 			}
 		}

@@ -17,23 +17,23 @@ public class DivideFunction implements Function {
 
 	@Override
 	public String calculate(final String[] args, final Register register) {
-		if(Utility.isDouble(args[0]) || Utility.isDouble(args[1])) {
+		if(isDouble(args[0]) || isDouble(args[1])) {
 			return fromDouble(args, register);
-		} else if(Utility.isInteger(args[0]) && Utility.isInteger(args[1])) {
+		} else if(isInteger(args[0]) && isInteger(args[1])) {
 			return fromInt(args, register);
 		}
 		throw new RuntimeExecutionException("Unknown provided types: " + Arrays.asList(args));
 	}
 
 	private String fromInt(final String[] args, final Register register) {
-		int one = Utility.toInt(args[0], register);
-		int two = Utility.toInt(args[1], register);
+		int one = toInt(args[0], register);
+		int two = toInt(args[1], register);
 		return String.valueOf((one / two));
 	}
 
 	private String fromDouble(final String[] args, final Register register) {
-		double one = Utility.toDouble(args[0], register);
-		double two = Utility.toDouble(args[1], register);
+		double one = toDouble(args[0], register);
+		double two = toDouble(args[1], register);
 		return String.valueOf((one / two));
 	}
 
