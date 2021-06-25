@@ -1,27 +1,55 @@
 package com.github.thorbenkuck.scripting;
 
-import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
-public interface Register extends Serializable {
+public class Register {
 
-	static Register create() {
-		return new MappingRegister();
+	private final Map<String, String> core;
+
+	public static String NOT_KNOWN = "undefined";
+
+	public Register(Map<String, String> values) {
+		this.core = new HashMap<>(values);
 	}
 
-	static Register create(Map<String, String> values) {
-		return new MappingRegister(values);
+	public Register() {
+		this(new HashMap<>());
 	}
 
-	String NULL_VALUE = "null";
+	public void put(String key, String value) {
+		core.put(key, value);
+	}
 
-	void put(String key, String value);
+	public String get(String key) {
+		return core.getOrDefault(key, NOT_KNOWN);
+	}
 
-	String get(String key);
+	public void ifPresent(String key, Consumer<String> consumer) {
+		if(has(key)) {
+			consumer.accept(get(key));
+		}
+	}
 
-	void remove(String name);
+	public boolean has(String key) {
+		return get(key).equals(NOT_KNOWN);
+	}
 
-	void clear();
+	public void remove(String name) {
+		core.remove(name);
+	}
 
-	void adapt(Map<String, String> initialRegisterValues);
+	public void clear() {
+		core.clear();
+	}
+
+	public void adapt(Map<String, String> initialRegisterValues) {
+		initialRegisterValues.forEach(core::putIfAbsent);
+	}
+
+	@Override
+	public String toString() {
+		return core.toString();
+	}
 }

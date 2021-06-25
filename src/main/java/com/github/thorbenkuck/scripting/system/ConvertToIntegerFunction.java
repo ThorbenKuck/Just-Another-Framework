@@ -1,8 +1,7 @@
 package com.github.thorbenkuck.scripting.system;
 
-import com.github.thorbenkuck.scripting.Function;
+import com.github.thorbenkuck.scripting.components.Function;
 import com.github.thorbenkuck.scripting.Register;
-import com.github.thorbenkuck.scripting.Utility;
 
 public class ConvertToIntegerFunction implements Function {
 
@@ -14,11 +13,11 @@ public class ConvertToIntegerFunction implements Function {
 	@Override
 	public String calculate(String[] args, Register register) {
 		for(String arg : args) {
-			String value = register.get(arg);
-			if(value.equals(Register.NULL_VALUE)) {
+			if(!register.has(arg)) {
 				continue;
 			}
-			if(! isInteger(value)) {
+			String value = register.get(arg);
+			if(!isInteger(value)) {
 				register.put(arg, "0");
 			}
 		}

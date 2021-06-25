@@ -1,4 +1,4 @@
-package com.github.thorbenkuck.scripting;
+package com.github.thorbenkuck.scripting.parsing;
 
 public interface LineParser extends Iterable<Line> {
 

@@ -1,6 +1,6 @@
 package com.github.thorbenkuck.scripting.io;
 
-import com.github.thorbenkuck.scripting.Parser;
+import com.github.thorbenkuck.scripting.parsing.Parser;
 import com.github.thorbenkuck.scripting.packages.Package;
 
 public class IOModule {
@@ -13,7 +13,7 @@ public class IOModule {
 		return Package.build()
 				.add(new PrintFunction())
 				.add(new PrintLineFunction())
-				.create();
+				.buildInMemory();
 	}
 
 }

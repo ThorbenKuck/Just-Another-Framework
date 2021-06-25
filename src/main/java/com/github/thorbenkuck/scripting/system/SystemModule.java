@@ -1,6 +1,6 @@
 package com.github.thorbenkuck.scripting.system;
 
-import com.github.thorbenkuck.scripting.Parser;
+import com.github.thorbenkuck.scripting.parsing.Parser;
 import com.github.thorbenkuck.scripting.packages.Package;
 
 public class SystemModule {
@@ -18,6 +18,6 @@ public class SystemModule {
 				.add(new DeleteRule())
 				.add(new LoopStartRule())
 				.add(new LoopEndRule())
-				.create();
+				.buildInMemory();
 	}
 }

@@ -1,18 +1,18 @@
 package com.github.thorbenkuck.scripting.packages;
 
-import com.github.thorbenkuck.scripting.Function;
-import com.github.thorbenkuck.scripting.Rule;
+import com.github.thorbenkuck.scripting.components.Function;
+import com.github.thorbenkuck.scripting.components.Rule;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-class PackageImpl implements Package {
+class InMemoryPackage implements ModifiablePackage {
 
 	private final List<Function> functionList = new ArrayList<>();
 	private final List<Rule> ruleList = new ArrayList<>();
 
-	public PackageImpl(Collection<Function> functionCollection, Collection<Rule> ruleCollection) {
+	public InMemoryPackage(Collection<Function> functionCollection, Collection<Rule> ruleCollection) {
 		functionList.addAll(functionCollection);
 		ruleList.addAll(ruleCollection);
 	}

@@ -1,13 +1,13 @@
-package com.github.thorbenkuck.scripting;
+package com.github.thorbenkuck.scripting.parsing;
 
 import java.util.*;
 
-class LineImpl implements Line {
+class StringLine implements Line {
 
 	private String content;
 	private final int lineNumber;
 
-	LineImpl(String content, int lineNumber) {
+	StringLine(String content, int lineNumber) {
 		this.content = content;
 		this.lineNumber = lineNumber;
 	}
@@ -21,9 +21,9 @@ class LineImpl implements Line {
 
 	@Override
 	public void remove(int from, int to) {
-		for(int index = from ; index <= to ; index++) {
-			remove(0);
-		}
+		StringBuilder stringBuilder = new StringBuilder(content);
+		stringBuilder.delete(from, to);
+		content = stringBuilder.toString();
 	}
 
 	@Override
@@ -62,7 +62,7 @@ class LineImpl implements Line {
 
 	@Override
 	public boolean isBlank() {
-		for(char character : content.toCharArray()) {
+		for(final char character : content.toCharArray()) {
 			if(!(character == ' ')) {
 				return false;
 			}
@@ -87,7 +87,7 @@ class LineImpl implements Line {
 
 	@Override
 	public Line subPart(int begin, int end) {
-		return new LineImpl(content.substring(begin, end), lineNumber);
+		return new StringLine(content.substring(begin, end), lineNumber);
 	}
 
 	@Override
@@ -112,7 +112,7 @@ class LineImpl implements Line {
 
 	@Override
 	public Line duplicate() {
-		return new LineImpl(content, lineNumber);
+		return new StringLine(content, lineNumber);
 	}
 
 	@Override
@@ -171,10 +171,9 @@ class LineImpl implements Line {
 		return new CharacterIterator(content.toCharArray());
 	}
 
-	private class CharacterIterator implements Iterator<Character> {
+	private static class CharacterIterator implements Iterator<Character> {
 
 		private final Queue<Character> elements;
-		private Character current;
 
 		private CharacterIterator(final Collection<Character> elements) {
 			this.elements = new LinkedList<>(elements);
@@ -210,8 +209,7 @@ class LineImpl implements Line {
 		 */
 		@Override
 		public Character next() {
-			current = elements.poll();
-			return current;
+			return elements.poll();
 		}
 	}
 }

@@ -1,6 +1,6 @@
 package com.github.thorbenkuck.scripting.math;
 
-import com.github.thorbenkuck.scripting.Parser;
+import com.github.thorbenkuck.scripting.parsing.Parser;
 import com.github.thorbenkuck.scripting.packages.Package;
 
 public class MathModule {
@@ -18,7 +18,7 @@ public class MathModule {
 				.add(new IncrementRule())
 				.add(new DecrementRule())
 				.add(new AddRule())
-				.create();
+				.buildInMemory();
 	}
 
 }

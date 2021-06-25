@@ -1,7 +1,11 @@
 package com.github.thorbenkuck.scripting.math;
 
 import com.github.thorbenkuck.scripting.*;
+import com.github.thorbenkuck.scripting.components.Rule;
 import com.github.thorbenkuck.scripting.exceptions.RuntimeExecutionException;
+import com.github.thorbenkuck.scripting.parsing.Line;
+import com.github.thorbenkuck.scripting.parsing.Parser;
+import com.github.thorbenkuck.scripting.script.ScriptElement;
 
 public class IncrementRule implements Rule {
 
@@ -11,12 +15,12 @@ public class IncrementRule implements Rule {
 	}
 
 	@Override
-	public ScriptElement<Register> apply(Line line, Parser parser, int linePointer) {
+	public ScriptElement apply(Line line, Parser parser, int linePointer) {
 		String reference = line.subPart(2, line.length()).toString();
-		return new ScriptElement<Register>() {
+		return new ScriptElement() {
 			@Override
 			public void accept(Register register) {
-				if(register.get(reference).equals(Register.NULL_VALUE)) {
+				if(register.has(reference)) {
 					throw new RuntimeExecutionException("Increment is only applicable to variables");
 				}
 				String currentValue = register.get(reference);

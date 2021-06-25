@@ -1,9 +1,8 @@
 package com.github.thorbenkuck.scripting.math;
 
-import com.github.thorbenkuck.scripting.Function;
-import com.github.thorbenkuck.scripting.Parser;
+import com.github.thorbenkuck.scripting.components.Function;
+import com.github.thorbenkuck.scripting.parsing.Parser;
 import com.github.thorbenkuck.scripting.Register;
-import com.github.thorbenkuck.scripting.Utility;
 
 import java.util.Arrays;
 

@@ -1,7 +1,7 @@
 package com.github.thorbenkuck.scripting.test;
 
-import com.github.thorbenkuck.scripting.Parser;
-import com.github.thorbenkuck.scripting.Script;
+import com.github.thorbenkuck.scripting.parsing.Parser;
+import com.github.thorbenkuck.scripting.script.Script;
 import com.github.thorbenkuck.scripting.exceptions.ExecutionFailedException;
 import com.github.thorbenkuck.scripting.exceptions.ParsingFailedException;
 import com.github.thorbenkuck.scripting.io.IOModule;
@@ -29,30 +29,30 @@ public class ScriptingTest {
 					"var y = x;" +
 					"require(y);" +
 					"loop i 1:5;" +
-					"    print(i);" +
-					"    print(\"=\");" +
-					"    println(y);" +
 					"    loop j 1:3;" +
+					"        println(\"i=\", i);" +
+					"        println(\"j=\", j);" +
+					"        println(\"y=\", y);" +
 					"        ++y;" +
 					"    endLoop j;" +
 					"endLoop i;" +
 					"println(\"x should still be what you selected: \", x);" +
 					"println(\"i=\", i);" +
-					"print(\"j=\", j);" +
+					"println(\"j=\", j);" +
 					"var z;" +
 					"println(\"z=\", z);" +
 					"delete z;" +
-					"println(\"z=\");" +
+					"println(\"z=\", z);" +
 					"println(\"END\");";
 
 	public static void main(String[] args) {
-		Parser parser = Parser.create();
+		Parser parser = new Parser();
 
 		Package foundation = Package.build()
 				.add(IOModule.getPackage())
 				.add(SystemModule.getPackage())
 				.add(MathModule.getPackage())
-				.create();
+				.buildInMemory();
 
 		parser.add(foundation);
 

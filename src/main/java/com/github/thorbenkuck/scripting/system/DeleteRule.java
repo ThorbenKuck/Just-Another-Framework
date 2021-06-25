@@ -1,6 +1,10 @@
 package com.github.thorbenkuck.scripting.system;
 
 import com.github.thorbenkuck.scripting.*;
+import com.github.thorbenkuck.scripting.components.Rule;
+import com.github.thorbenkuck.scripting.parsing.Line;
+import com.github.thorbenkuck.scripting.parsing.Parser;
+import com.github.thorbenkuck.scripting.script.ScriptElement;
 
 public class DeleteRule implements Rule {
 	@Override
@@ -9,9 +13,9 @@ public class DeleteRule implements Rule {
 	}
 
 	@Override
-	public ScriptElement<Register> apply(Line line, Parser parser, int linePointer) {
+	public ScriptElement apply(Line line, Parser parser, int linePointer) {
 		String name = line.subPart(line.lastIndexOf(" ") + 1).toString();
-		return new ScriptElement<Register>() {
+		return new ScriptElement() {
 			@Override
 			public void accept(Register register) {
 				// Blindly remove it

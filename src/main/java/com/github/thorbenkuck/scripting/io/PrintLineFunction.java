@@ -1,6 +1,6 @@
 package com.github.thorbenkuck.scripting.io;
 
-import com.github.thorbenkuck.scripting.Function;
+import com.github.thorbenkuck.scripting.components.Function;
 import com.github.thorbenkuck.scripting.Register;
 
 import java.io.PrintStream;
@@ -23,7 +23,7 @@ public class PrintLineFunction implements Function {
 			return NO_RETURN_VALUE;
 		}
 		if(args.length == 0) {
-			IOUtils.printAccordingToType("", register, out, "\n");
+			IOUtils.newLine(out);
 			return NO_RETURN_VALUE;
 		}
 
@@ -31,7 +31,7 @@ public class PrintLineFunction implements Function {
 			IOUtils.printAccordingToType(name, register, out);
 		}
 
-		IOUtils.printAccordingToType("", register, out, "\n");
+		IOUtils.newLine(out);
 
 		return NO_RETURN_VALUE;
 	}

@@ -1,8 +1,15 @@
-package com.github.thorbenkuck.scripting;
+package com.github.thorbenkuck.scripting.parsing;
 
 import com.github.thorbenkuck.keller.pipe.Pipeline;
+import com.github.thorbenkuck.scripting.Register;
+import com.github.thorbenkuck.scripting.script.Script;
+import com.github.thorbenkuck.scripting.script.ScriptElement;
+import com.github.thorbenkuck.scripting.Utility;
+import com.github.thorbenkuck.scripting.components.Function;
+import com.github.thorbenkuck.scripting.components.Rule;
 import com.github.thorbenkuck.scripting.exceptions.ParsingFailedException;
 import com.github.thorbenkuck.scripting.packages.Package;
+import com.github.thorbenkuck.scripting.parsing.diagnostic.DiagnosticManager;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -11,15 +18,15 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
-class ParserImpl implements Parser {
+public class Parser {
 
 	private final List<Rule> rules = new ArrayList<>();
 	private final Map<String, Function> functions = new HashMap<>();
 	private final Lock functionsLock = new ReentrantLock(true);
 	private final Lock ruleLock = new ReentrantLock(true);
-	private final Register internalVariables = Register.create();
+	private final Register internalVariables = new Register();
 	private final AtomicBoolean running = new AtomicBoolean(false);
-	private final Queue<ScriptElement<Register>> created = new LinkedList<>();
+	private final Queue<ScriptElement> created = new LinkedList<>();
 	private final Pipeline<ParsingFailedException> errorPipeline = Pipeline.unifiedCreation();
 	private final AtomicReference<DiagnosticManager> diagnosticManagerReference;
 	private final DefaultLineParser lineParser = new DefaultLineParser();
@@ -27,11 +34,11 @@ class ParserImpl implements Parser {
 	private final List<String> errorMessages = new ArrayList<>();
 	private final List<Integer> faultyLines = new ArrayList<>();
 
-	ParserImpl() {
+	public Parser() {
 		this(DiagnosticManager.systemErr());
 	}
 
-	ParserImpl(DiagnosticManager diagnosticManager) {
+	public Parser(DiagnosticManager diagnosticManager) {
 		this.diagnosticManagerReference = new AtomicReference<>(diagnosticManager);
 	}
 
@@ -41,11 +48,11 @@ class ParserImpl implements Parser {
 		}
 	}
 
-	private boolean applyRules(final Line line, final Queue<ScriptElement<Register>> created) {
+	private boolean applyRules(final Line line, final Queue<ScriptElement> created) {
 		boolean success = false;
 		for (Rule rule : rules) {
 			if (rule.applies(line)) {
-				ScriptElement<Register> consumer = rule.apply(line, this, line.getLineNumber());
+				ScriptElement consumer = rule.apply(line, this, line.getLineNumber());
 				if (consumer != null) {
 					created.add(consumer);
 					success = true;
@@ -149,7 +156,7 @@ class ParserImpl implements Parser {
 				}
 			}
 		}
-		return results.toArray(new String[results.size()]);
+		return results.toArray(new String[0]);
 	}
 
 	private String spliceNextFunction(Line line) {
@@ -180,7 +187,7 @@ class ParserImpl implements Parser {
 			results.add(spliceNextFunction(line));
 		}
 
-		return results.toArray(new String[results.size()]);
+		return results.toArray(new String[0]);
 	}
 
 	private String[] getArgumentsOfFunction(Line line) {
@@ -206,7 +213,7 @@ class ParserImpl implements Parser {
 			}
 		}
 
-		return results.toArray(new String[results.size()]);
+		return results.toArray(new String[0]);
 	}
 
 	private boolean isFunction(Line line) {
@@ -300,12 +307,10 @@ class ParserImpl implements Parser {
 		}
 	}
 
-	@Override
 	public synchronized Script parse(String string) throws ParsingFailedException {
 		return parse(LineProvider.ofString(string));
 	}
 
-	@Override
 	public synchronized Script parse(LineProvider lineProvider) throws ParsingFailedException {
 		running.set(true);
 		synchronized (lineParser) {
@@ -319,7 +324,7 @@ class ParserImpl implements Parser {
 		// for multi-line brackets,
 		// but it is way easier that way
 		checkForError();
-		ScriptImpl result;
+		Script result;
 
 		try {
 			functionsLock.lock();
@@ -361,7 +366,7 @@ class ParserImpl implements Parser {
 			ruleLock.unlock();
 			synchronized (this) {
 				internalVariables.clear();
-				result = new ScriptImpl(created);
+				result = new Script(created);
 				created.clear();
 				currentFunctionCount = 0;
 			}
@@ -371,32 +376,26 @@ class ParserImpl implements Parser {
 		return result;
 	}
 
-	@Override
 	public Register getParserRegister() {
 		return internalVariables;
 	}
 
-	@Override
 	public void freezeLinePointer() {
 		lineParser.freezeLinePointer();
 	}
 
-	@Override
 	public void setLinePointer(int to) {
 		lineParser.setLinePointer(to);
 	}
 
-	@Override
 	public void setInternalVariable(String key, String value) {
 		this.internalVariables.put(key, value);
 	}
 
-	@Override
 	public String getInternalVariable(String key) {
 		return this.internalVariables.get(key);
 	}
 
-	@Override
 	public void error(String message, int lineNumber) {
 		running.set(false);
 		faultyLines.add(lineNumber);
@@ -404,49 +403,40 @@ class ParserImpl implements Parser {
 		diagnosticManagerReference.get().onError(message, lineParser.getLine(lineNumber));
 	}
 
-	@Override
 	public void error(final String message) {
 		error(message, lineParser.getLinePointer());
 	}
 
-	@Override
 	public void warn(String message, int lineNumber) {
 		Line line = lineParser.getLine(lineNumber);
 		diagnosticManagerReference.get().onWarning(message, line);
 	}
 
-	@Override
 	public void warn(String message) {
 		warn(message, lineParser.getLinePointer());
 	}
 
-	@Override
 	public void notice(String message, int lineNumber) {
 		Line line = lineParser.getLine(lineNumber);
 		diagnosticManagerReference.get().onNotice(message, line);
 	}
 
-	@Override
 	public void notice(String message) {
 		notice(message, lineParser.getLinePointer());
 	}
 
-	@Override
 	public void clearInternalVariable(String name) {
 		internalVariables.remove(name);
 	}
 
-	@Override
-	public void insert(ScriptElement<Register> consumer) {
+	public void insert(ScriptElement consumer) {
 		created.add(consumer);
 	}
 
-	@Override
 	public void deleteInternalVariable(String name) {
 		internalVariables.remove(name);
 	}
 
-	@Override
 	public void add(Function function) {
 		try {
 			functionsLock.lock();
@@ -456,7 +446,6 @@ class ParserImpl implements Parser {
 		}
 	}
 
-	@Override
 	public void add(Rule rule) {
 		try {
 			ruleLock.lock();
@@ -466,7 +455,6 @@ class ParserImpl implements Parser {
 		}
 	}
 
-	@Override
 	public void add(Package newPackage) {
 		for (Rule rule : newPackage.getRules()) {
 			add(rule);
@@ -477,12 +465,10 @@ class ParserImpl implements Parser {
 		}
 	}
 
-	@Override
 	public void addParsingFailedHandler(Consumer<ParsingFailedException> consumer) {
 		errorPipeline.addFirst(consumer);
 	}
 
-	@Override
 	public void setDiagnosticManager(DiagnosticManager diagnosticManager) {
 		Objects.requireNonNull(diagnosticManager);
 		synchronized (this.diagnosticManagerReference) {

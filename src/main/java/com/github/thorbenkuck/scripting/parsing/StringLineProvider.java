@@ -1,4 +1,5 @@
-package com.github.thorbenkuck.scripting;
+package com.github.thorbenkuck.scripting.parsing;
+
 
 import java.util.ArrayList;
 import java.util.List;

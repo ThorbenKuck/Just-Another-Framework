@@ -1,12 +1,14 @@
-package com.github.thorbenkuck.scripting;
+package com.github.thorbenkuck.scripting.parsing.diagnostic;
+
+import com.github.thorbenkuck.scripting.parsing.Line;
 
 import java.io.PrintStream;
 
-class DefaultDiagnosticManager implements DiagnosticManager {
+public class PrintStreamDiagnosticManager implements DiagnosticManager {
 
 	private final PrintStream printStream;
 
-	DefaultDiagnosticManager(PrintStream printStream) {
+	public PrintStreamDiagnosticManager(PrintStream printStream) {
 		this.printStream = printStream;
 	}
 

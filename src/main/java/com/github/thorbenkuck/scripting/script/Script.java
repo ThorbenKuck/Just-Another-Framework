@@ -1,23 +1,24 @@
-package com.github.thorbenkuck.scripting;
+package com.github.thorbenkuck.scripting.script;
 
+import com.github.thorbenkuck.scripting.Register;
 import com.github.thorbenkuck.scripting.exceptions.ExecutionFailedException;
+import com.github.thorbenkuck.scripting.script.ScriptElement;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
-class ScriptImpl implements Script {
+public class Script {
 
-	private final Queue<ScriptElement<Register>> core = new LinkedList<>();
+	private final Queue<ScriptElement> core = new LinkedList<>();
 	private final Map<String, String> initialRegisterValues = new HashMap<>();
 	private final LocalDateTime timeOfCreation = LocalDateTime.now();
 	private String name = "Script(" + timeOfCreation + ")";
 
-	ScriptImpl(Queue<ScriptElement<Register>> core) {
+	public Script(Queue<ScriptElement> core) {
 		this.core.addAll(core);
 	}
 
-	@Override
-	public void addInstruction(ScriptElement<Register> instruction) {
+	public void addInstruction(ScriptElement instruction) {
 		synchronized (core) {
 			core.add(instruction);
 		}
@@ -27,14 +28,14 @@ class ScriptImpl implements Script {
 		synchronized (initialRegisterValues) {
 			register.adapt(initialRegisterValues);
 		}
-		Queue<ScriptElement<Register>> copy;
+		Queue<ScriptElement> copy;
 		synchronized (core) {
 			copy = new LinkedList<>(core);
 		}
 
 		try {
 			while(copy.peek() != null) {
-				ScriptElement<Register> consumer = copy.poll();
+				ScriptElement consumer = copy.poll();
 				consumer.accept(register);
 			}
 		} catch (Exception e) {
@@ -44,14 +45,34 @@ class ScriptImpl implements Script {
 		}
 	}
 
-	@Override
 	public void run(Map<String, String> registerValues) throws ExecutionFailedException {
-		doRun(Register.create(registerValues));
+		doRun(new Register(registerValues));
 	}
 
-	@Override
 	public void run() throws ExecutionFailedException {
-		doRun(Register.create());
+		doRun(new Register());
+	}
+
+	public void setValue(String key, String value) {
+		initialRegisterValues.put(key, value);
+	}
+
+	public int countInstructions() {
+		synchronized (core) {
+			return core.size();
+		}
+	}
+
+	public void setName(String string) {
+		this.name = string;
+	}
+
+	public LocalDateTime getTimeOfCreation() {
+		return timeOfCreation;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	@Override
@@ -60,42 +81,15 @@ class ScriptImpl implements Script {
 		StringBuilder result = new StringBuilder(getName());
 		result.append("------ SCRIPT_START").append(System.lineSeparator());
 
-		final List<ScriptElement<Register>> consumerCopy;
+		final List<ScriptElement> consumerCopy;
 		synchronized (core) {
 			consumerCopy = new ArrayList<>(core);
 		}
 
-		for(ScriptElement<Register> consumer : consumerCopy) {
+		for(ScriptElement consumer : consumerCopy) {
 			result.append("(").append(lineCounter++).append("): ").append(consumer).append(System.lineSeparator());
 		}
 		result.append("------ SCRIPT_END");
 		return result.toString();
-	}
-
-	@Override
-	public void setValue(String key, String value) {
-		initialRegisterValues.put(key, value);
-	}
-
-	@Override
-	public int countInstructions() {
-		synchronized (core) {
-			return core.size();
-		}
-	}
-
-	@Override
-	public void setName(String string) {
-		this.name = string;
-	}
-
-	@Override
-	public LocalDateTime getTimeOfCreation() {
-		return timeOfCreation;
-	}
-
-	@Override
-	public String getName() {
-		return name;
 	}
 }

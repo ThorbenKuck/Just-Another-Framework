@@ -1,7 +1,7 @@
 package com.github.thorbenkuck.scripting.packages;
 
-import com.github.thorbenkuck.scripting.Function;
-import com.github.thorbenkuck.scripting.Rule;
+import com.github.thorbenkuck.scripting.components.Function;
+import com.github.thorbenkuck.scripting.components.Rule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ class PackageFactory implements PackageBuilder {
 	}
 
 	@Override
-	public Package create() {
-		return new PackageImpl(functions, rules);
+	public ModifiablePackage buildInMemory() {
+		return new InMemoryPackage(functions, rules);
 	}
 }

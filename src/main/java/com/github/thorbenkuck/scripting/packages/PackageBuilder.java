@@ -1,7 +1,7 @@
 package com.github.thorbenkuck.scripting.packages;
 
-import com.github.thorbenkuck.scripting.Function;
-import com.github.thorbenkuck.scripting.Rule;
+import com.github.thorbenkuck.scripting.components.Function;
+import com.github.thorbenkuck.scripting.components.Rule;
 
 public interface PackageBuilder {
 
@@ -21,6 +21,6 @@ public interface PackageBuilder {
 
 	PackageBuilder add(Package toAdd);
 
-	Package create();
+	ModifiablePackage buildInMemory();
 
 }

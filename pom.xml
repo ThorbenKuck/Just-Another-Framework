@@ -4,7 +4,7 @@
     <artifactId>jaf</artifactId>
     <version>0.4</version>
     <packaging>jar</packaging>
-    <name>jaf</name>
+    <name>Just Another Framework</name>
     <description>Scripting engine</description>
     <url>https://github.com/ThorbenKuck/Scripting</url>
     <properties>

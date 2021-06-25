@@ -1,12 +1,14 @@
 package com.github.thorbenkuck.scripting;
 
+import com.github.thorbenkuck.scripting.components.Function;
+import com.github.thorbenkuck.scripting.script.ScriptElement;
+
 import java.util.Arrays;
-import java.util.function.Consumer;
 
 public class Utility {
 
-	public static ScriptElement<Register> createPrintVariable(String variableName) {
-		return new ScriptElement<Register>() {
+	public static ScriptElement createPrintVariable(String variableName) {
+		return new ScriptElement() {
 			public void accept(Register register) {
 				System.out.print(register.get(variableName));
 			}
@@ -18,9 +20,9 @@ public class Utility {
 		};
 	}
 
-	public static ScriptElement<Register> createPrintText(String what) {
+	public static ScriptElement createPrintText(String what) {
 
-		return new ScriptElement<Register>() {
+		return new ScriptElement() {
 			public void accept(Register register) {
 				System.out.print(what);
 			}
@@ -32,8 +34,8 @@ public class Utility {
 		};
 	}
 
-	public static ScriptElement<Register> createPrintLineVariable(String variableName) {
-		return new ScriptElement<Register>() {
+	public static ScriptElement createPrintLineVariable(String variableName) {
+		return new ScriptElement() {
 			public void accept(Register register) {
 				System.out.println(register.get(variableName));
 			}
@@ -45,8 +47,8 @@ public class Utility {
 		};
 	}
 
-	public static ScriptElement<Register> createPrintLineText(String what) {
-		return new ScriptElement<Register>() {
+	public static ScriptElement createPrintLineText(String what) {
+		return new ScriptElement() {
 			public void accept(Register register) {
 				System.out.println(what);
 			}
@@ -58,9 +60,9 @@ public class Utility {
 		};
 	}
 
-	public static ScriptElement<Register> wrapFunction(Function function, String registerAddress, String[] args) {
+	public static ScriptElement wrapFunction(Function function, String registerAddress, String[] args) {
 		if(Function.NO_RETURN_VALUE.equals(function.hintReturnValue())) {
-			return new ScriptElement<Register>() {
+			return new ScriptElement() {
 
 				@Override
 				public void accept(Register register) {
@@ -73,7 +75,7 @@ public class Utility {
 				}
 			};
 		} else {
-			return new ScriptElement<Register>() {
+			return new ScriptElement() {
 
 				@Override
 				public void accept(Register register) {

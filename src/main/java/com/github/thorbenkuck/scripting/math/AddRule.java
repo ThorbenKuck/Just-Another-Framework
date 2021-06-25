@@ -1,8 +1,10 @@
 package com.github.thorbenkuck.scripting.math;
 
 import com.github.thorbenkuck.scripting.*;
-
-import java.util.function.Consumer;
+import com.github.thorbenkuck.scripting.components.Rule;
+import com.github.thorbenkuck.scripting.parsing.Line;
+import com.github.thorbenkuck.scripting.parsing.Parser;
+import com.github.thorbenkuck.scripting.script.ScriptElement;
 
 public class AddRule implements Rule {
 
@@ -15,7 +17,7 @@ public class AddRule implements Rule {
 	}
 
 	@Override
-	public ScriptElement<Register> apply(final Line line, final Parser parser, final int linePointer) {
+	public ScriptElement apply(final Line line, final Parser parser, final int linePointer) {
 		// Since we are lazy,
 		// we just wrap the
 		// add function, to

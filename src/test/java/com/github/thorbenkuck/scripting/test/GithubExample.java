@@ -1,10 +1,13 @@
 package com.github.thorbenkuck.scripting.test;
 
 import com.github.thorbenkuck.scripting.*;
+import com.github.thorbenkuck.scripting.components.Function;
 import com.github.thorbenkuck.scripting.exceptions.ExecutionFailedException;
 import com.github.thorbenkuck.scripting.exceptions.ParsingFailedException;
 import com.github.thorbenkuck.scripting.exceptions.RuntimeExecutionException;
 import com.github.thorbenkuck.scripting.math.MathModule;
+import com.github.thorbenkuck.scripting.parsing.Parser;
+import com.github.thorbenkuck.scripting.script.Script;
 import com.github.thorbenkuck.scripting.system.VariableDefinitionRule;
 import com.github.thorbenkuck.scripting.system.VariableInitializerRule;
 
@@ -26,7 +29,7 @@ public class GithubExample {
 				+ "var result = pow(y, y);"
 				+ "export(result);";
 
-		Parser parser = Parser.create();
+		Parser parser = new Parser();
 
 		parser.add(new VariableInitializerRule());
 		parser.add(new VariableDefinitionRule());

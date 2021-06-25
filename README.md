@@ -35,8 +35,8 @@ Just add this dependency to your pom.xml
 ```
 <dependency>
     <groupId>com.github.thorbenkuck</groupId>
-    <artifactId>Scripting</artifactId>
-    <version>0.3</version>
+    <artifactId>jaf</artifactId>
+    <version>0.4</version>
 </dependency>
 ```
 
@@ -45,7 +45,7 @@ Just add this dependency to your pom.xml
 Just add this dependency to your dependency part in build.gradle
 
 ```
-compile group: 'com.github.thorbenkuck', name: 'Scripting', version: '0.3'
+compile group: 'com.github.thorbenkuck', name: 'jaf', version: '0.4'
 ```
 
 ------
@@ -55,25 +55,24 @@ compile group: 'com.github.thorbenkuck', name: 'Scripting', version: '0.3'
 A "simple" Example:
 
 ```java
-import com.github.thorbenkuck.scripting.Parser;
-import com.github.thorbenkuck.scripting.Script;
+import com.github.thorbenkuck.scripting.parsing.Parser;
+import com.github.thorbenkuck.scripting.script.Script;
 import com.github.thorbenkuck.scripting.exceptions.ExecutionFailedException;
 import com.github.thorbenkuck.scripting.exceptions.ParsingFailedException;
 import com.github.thorbenkuck.scripting.io.IOModule;
 import com.github.thorbenkuck.scripting.math.MathModule;
 import com.github.thorbenkuck.scripting.packages.Package;
-import com.github.thorbenkuck.scripting.packages.PackageBuilder;
 import com.github.thorbenkuck.scripting.system.SystemModule;
 
 public class Example {
-	public void run() {
+    public void run() {
         // The Script we want to evaluate.
         // Since this is only one line, we have to put ; as a crlf
         // The intends are optional.
         // Every function and rule is supported by this framework
         // This is the best i could come up with.. sorry for 
         // possible confusions.. Let me explain those functions:
-   
+
         //print(..)       prints something
         //println(..)     prints something followed by a new line
         //require($)      throws an exception, if variable($) is not set
@@ -105,13 +104,13 @@ public class Example {
                         "var z;" +
                         "print(\"z=\");println(z);" +
                         "println(\"END\");";
-   
+
         // Creates a new Parser.
         // Every Parser is unique and
         // maintains its own set of rules
         // and functions.
-        Parser parser = Parser.create();
-   
+        Parser parser = new Parser();
+
         // Hook up all your rules and functions
         // Here, we use the provided ones and
         // simply apply all default Rules
@@ -126,10 +125,10 @@ public class Example {
                 .add(IOModule.getPackage())
                 .add(SystemModule.getPackage())
                 .add(MathModule.getPackage())
-                .create();
-   
+                .buildInMemory();
+
         parser.add(foundation);
-   
+
         // Parse the Script.
         // This will return an executable script
         Script script;
@@ -139,16 +138,16 @@ public class Example {
             e.printStackTrace();
             return;
         }
-   
+
         System.out.println("script parsed!");
-   
+
         // Prints every step the script is going to take
         // If the Output is to much for you, simply delte
         // this following 3 lines.
         System.out.println();
         System.out.println(script);
         System.out.println();
-   
+
         // Inject "outside" variables.
         // You can also set them, once you
         // call Script#run by providing
@@ -158,7 +157,7 @@ public class Example {
         // Strings, which we might convert
         // to Objects as we execute our java-code
         script.setValue("x", "10");
-   
+
         // Now we run our Script. This may throw an
         // ExecutionFailedException if anything
         // goes wrong as we run it. Should not
@@ -194,13 +193,13 @@ public class AddFunction implements Function {
             while (leftOver.peek() != null) {
                 String arg = leftOver.poll();
 	        String value;
-                if(isVariable.apply(arg)) {
+                if(isVariable(arg)) {
                     value = register.get(arg);
                 } else {
                    value = arg;
                 }
         	    result.append(value);
-                if(Utility.isInteger(value)) {
+                if(isInteger(value)) {
                     count += Integer.parseInt(value);
                 } else {
                     count += 0;
@@ -218,7 +217,7 @@ Let's parse an example Skript:
 String toEvaluate = "var x = 1;"
                + "println(add(add(add(add(x), x), add(x), add(x)), add(x), x));";
 
-Parser parser = Parser.create();
+Parser parser = new Parser();
 
 parser.add(new PrintLineFunction());
 parser.add(new AddFunction());

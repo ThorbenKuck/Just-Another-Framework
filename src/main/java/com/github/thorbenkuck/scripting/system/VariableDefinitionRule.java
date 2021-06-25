@@ -1,7 +1,11 @@
 package com.github.thorbenkuck.scripting.system;
 
 import com.github.thorbenkuck.scripting.*;
+import com.github.thorbenkuck.scripting.components.Rule;
 import com.github.thorbenkuck.scripting.exceptions.RuntimeExecutionException;
+import com.github.thorbenkuck.scripting.parsing.Line;
+import com.github.thorbenkuck.scripting.parsing.Parser;
+import com.github.thorbenkuck.scripting.script.ScriptElement;
 
 public class VariableDefinitionRule implements Rule {
 
@@ -11,21 +15,20 @@ public class VariableDefinitionRule implements Rule {
 	}
 
 	@Override
-	public ScriptElement<Register> apply(Line line, Parser parser, int linePointer) {
+	public ScriptElement apply(Line line, Parser parser, int linePointer) {
 		String name = parseVariableName(line.duplicate());
 		String value = parseVariableValue(line.duplicate());
-		return new ScriptElement<Register>() {
+		return new ScriptElement() {
 			@Override
 			public void accept(Register register) {
-				if(Register.NULL_VALUE.equals(register.get(name))) {
+				if(!register.has(name)) {
 					throw new RuntimeExecutionException(name + " is not defined");
 				} else {
 					if(VariableEvaluation.isAVariable(value, register)) {
-						String savedValue = register.get(value);
-						if(Register.NULL_VALUE.equals(savedValue)) {
+						if(!register.has(value)) {
 							throw new RuntimeExecutionException("Tried to set null variable!");
 						} else {
-							register.put(name, savedValue);
+							register.put(name, register.get(value));
 						}
 					} else {
 						register.put(name, value);

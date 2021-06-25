@@ -1,9 +1,9 @@
-package com.github.thorbenkuck.scripting;
+package com.github.thorbenkuck.scripting.parsing;
 
 public interface Line extends Iterable<Character> {
 
 	static Line create(String content, int lineNumber) {
-		return new LineImpl(content, lineNumber);
+		return new StringLine(content, lineNumber);
 	}
 
 	void remove(int index);

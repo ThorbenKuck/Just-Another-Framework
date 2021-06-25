@@ -1,6 +1,8 @@
 package com.github.thorbenkuck.scripting.math;
 
 import com.github.thorbenkuck.scripting.*;
+import com.github.thorbenkuck.scripting.components.Function;
+import com.github.thorbenkuck.scripting.parsing.Parser;
 
 public class SubtractFunction implements Function {
 

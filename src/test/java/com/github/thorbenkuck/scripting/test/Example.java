@@ -1,7 +1,7 @@
 package com.github.thorbenkuck.scripting.test;
 
-import com.github.thorbenkuck.scripting.Parser;
-import com.github.thorbenkuck.scripting.Script;
+import com.github.thorbenkuck.scripting.parsing.Parser;
+import com.github.thorbenkuck.scripting.script.Script;
 import com.github.thorbenkuck.scripting.exceptions.ExecutionFailedException;
 import com.github.thorbenkuck.scripting.exceptions.ParsingFailedException;
 import com.github.thorbenkuck.scripting.io.IOModule;
@@ -62,7 +62,7 @@ public class Example {
 		// Every Parser is unique and
 		// maintains its own set of rules
 		// and functions.
-		Parser parser = Parser.create();
+		Parser parser = new Parser();
 
 		// Hook up all your rules and functions
 		// Here, we use the provided ones and
@@ -79,7 +79,7 @@ public class Example {
 				.add(IOModule.getPackage())
 				.add(SystemModule.getPackage())
 				.add(MathModule.getPackage())
-				.create();
+				.buildInMemory();
 
 		ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 

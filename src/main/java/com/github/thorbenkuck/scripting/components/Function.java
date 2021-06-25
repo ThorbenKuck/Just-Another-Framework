@@ -1,5 +1,8 @@
-package com.github.thorbenkuck.scripting;
+package com.github.thorbenkuck.scripting.components;
 
+import com.github.thorbenkuck.scripting.parsing.Parser;
+import com.github.thorbenkuck.scripting.Register;
+import com.github.thorbenkuck.scripting.VariableEvaluation;
 import com.github.thorbenkuck.scripting.exceptions.RuntimeExecutionException;
 
 public interface Function extends VariableEvaluation {

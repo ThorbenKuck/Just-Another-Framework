@@ -5,7 +5,6 @@ public interface VariableEvaluation {
     /*
      * Type checks
      */
-
     default boolean isVariable(String string, Register register) {
         return VariableEvaluation.isAVariable(string, register);
     }
@@ -33,7 +32,6 @@ public interface VariableEvaluation {
     /*
      * Type conversions
      */
-
     default String asStringValue(String value) {
         return asAStringValue(value);
     }
@@ -54,17 +52,11 @@ public interface VariableEvaluation {
         return toADouble(s, register);
     }
 
-
-
-
-
-
-
-
-
-
+    /*
+     * Globally available Methods
+     */
     static boolean isAVariable(String string, Register register) {
-        return !isAString(string) && !register.get(string).equals(Register.NULL_VALUE);
+        return !isAString(string) && !register.has(string);
     }
 
     static boolean isAString(String string) {

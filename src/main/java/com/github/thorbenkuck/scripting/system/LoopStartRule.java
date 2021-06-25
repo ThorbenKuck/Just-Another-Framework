@@ -1,11 +1,15 @@
 package com.github.thorbenkuck.scripting.system;
 
 import com.github.thorbenkuck.scripting.*;
+import com.github.thorbenkuck.scripting.components.Rule;
+import com.github.thorbenkuck.scripting.parsing.Line;
+import com.github.thorbenkuck.scripting.parsing.Parser;
+import com.github.thorbenkuck.scripting.script.ScriptElement;
 
 public class LoopStartRule implements Rule {
 
 	@Override
-	public ScriptElement<Register> apply(Line line, Parser parser, int linePointer) {
+	public ScriptElement apply(Line line, Parser parser, int linePointer) {
 		String rawArgs = line.toString();
 		String withoutIdentifier = rawArgs.substring(5, rawArgs.length());
 		StringBuilder stringBuilder = new StringBuilder(withoutIdentifier);
@@ -16,7 +20,7 @@ public class LoopStartRule implements Rule {
 		String finale = stringBuilder.substring(0, stringBuilder.toString().length());
 		stringBuilder.delete(0, name.length() + 1);
 		Register parserRegister = parser.getParserRegister();
-		if (!Register.NULL_VALUE.equals(parserRegister.get(name))) {
+		if (parserRegister.has(name)) {
 			int value = Integer.parseInt(parserRegister.get(name));
 			++value;
 			String stringedValue = String.valueOf(value);
@@ -26,7 +30,7 @@ public class LoopStartRule implements Rule {
 				parser.deleteInternalVariable(name);
 				parserRegister.remove("loop" + name);
 				parserRegister.remove("loopEnd" + name);
-				return new ScriptElement<Register>() {
+				return new ScriptElement() {
 					@Override
 					public void accept(Register register) {
 						register.remove(name);
@@ -39,7 +43,7 @@ public class LoopStartRule implements Rule {
 				};
 			} else {
 				parserRegister.put(name, stringedValue);
-				return new ScriptElement<Register>() {
+				return new ScriptElement() {
 					@Override
 					public void accept(Register register) {
 						int count = Integer.parseInt(register.get(name));
@@ -57,7 +61,7 @@ public class LoopStartRule implements Rule {
 		} else {
 			parserRegister.put(name, initial);
 			parserRegister.put("loop" + name, String.valueOf(linePointer - 1));
-			return new ScriptElement<Register>() {
+			return new ScriptElement() {
 				@Override
 				public void accept(Register register) {
 					register.put(name, initial);
