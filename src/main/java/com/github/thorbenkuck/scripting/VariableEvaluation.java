@@ -56,7 +56,7 @@ public interface VariableEvaluation {
      * Globally available Methods
      */
     static boolean isAVariable(String string, Register register) {
-        return !isAString(string) && !register.has(string);
+        return !isAString(string) && register.has(string);
     }
 
     static boolean isAString(String string) {

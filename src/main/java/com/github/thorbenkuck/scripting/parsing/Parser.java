@@ -170,7 +170,7 @@ public class Parser {
 				--currentBracketStand;
 				currentArgument.append(character);
 				if (currentBracketStand == 0) {
-					line.remove(0, currentArgument.length() - 1);
+					line.remove(0, currentArgument.length());
 					return currentArgument.toString();
 				}
 			} else {
@@ -208,7 +208,7 @@ public class Parser {
 					}
 				}
 				results.add(currentArgument.toString());
-				line.remove(0, currentArgument.length() - 1);
+				line.remove(0, currentArgument.length());
 				currentArgument = new StringBuilder();
 			}
 		}

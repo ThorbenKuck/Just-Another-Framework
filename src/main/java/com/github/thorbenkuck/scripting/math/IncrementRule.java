@@ -20,7 +20,7 @@ public class IncrementRule implements Rule {
 		return new ScriptElement() {
 			@Override
 			public void accept(Register register) {
-				if(register.has(reference)) {
+				if(!register.has(reference)) {
 					throw new RuntimeExecutionException("Increment is only applicable to variables");
 				}
 				String currentValue = register.get(reference);

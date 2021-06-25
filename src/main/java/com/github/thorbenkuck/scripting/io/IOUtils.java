@@ -13,7 +13,7 @@ class IOUtils {
 	}
 
 	static void printAccordingToType(String s, Register register, PrintStream printStream, String suffix) throws RuntimeExecutionException {
-		if (! register.has(s)) {
+		if (register.has(s)) {
 			printStream.print(register.get(s));
 		} else if(VariableEvaluation.isAString(s)) {
 			String withoutLeading = s.substring(1);

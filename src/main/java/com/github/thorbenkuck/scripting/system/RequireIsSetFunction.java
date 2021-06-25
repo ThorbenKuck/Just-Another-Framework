@@ -6,12 +6,12 @@ import com.github.thorbenkuck.scripting.exceptions.RuntimeExecutionException;
 
 public class RequireIsSetFunction implements Function {
 	@Override
-	public String getFunctionName() {
+	public final String getFunctionName() {
 		return "require";
 	}
 
 	@Override
-	public String calculate(String[] args, Register register) {
+	public final String calculate(String[] args, Register register) {
 		for(String arg : args) {
 			if(!register.has(arg)) {
 				throw new RuntimeExecutionException("The value of " + arg + " is never set!");
@@ -21,7 +21,7 @@ public class RequireIsSetFunction implements Function {
 	}
 
 	@Override
-	public String hintReturnValue() {
+	public final String hintReturnValue() {
 		return NO_RETURN_VALUE;
 	}
 }

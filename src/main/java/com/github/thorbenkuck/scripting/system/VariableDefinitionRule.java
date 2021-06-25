@@ -10,37 +10,48 @@ import com.github.thorbenkuck.scripting.script.ScriptElement;
 public class VariableDefinitionRule implements Rule {
 
 	@Override
-	public boolean applies(Line line) {
+	public final boolean applies(Line line) {
 		return line.matches(".+[ ]*=[ ]*.+");
 	}
 
 	@Override
-	public ScriptElement apply(Line line, Parser parser, int linePointer) {
+	public final ScriptElement apply(Line line, Parser parser, int linePointer) {
 		String name = parseVariableName(line.duplicate());
 		String value = parseVariableValue(line.duplicate());
-		return new ScriptElement() {
-			@Override
-			public void accept(Register register) {
-				if(!register.has(name)) {
-					throw new RuntimeExecutionException(name + " is not defined");
-				} else {
-					if(VariableEvaluation.isAVariable(value, register)) {
-						if(!register.has(value)) {
-							throw new RuntimeExecutionException("Tried to set null variable!");
-						} else {
-							register.put(name, register.get(value));
-						}
+		return new VariableDefinitionRuleElement(name, value);
+	}
+
+	public static final class VariableDefinitionRuleElement implements ScriptElement {
+
+		private final String name;
+		private final String value;
+
+		public VariableDefinitionRuleElement(String name, String value) {
+			this.name = name;
+			this.value = value;
+		}
+
+		@Override
+		public final void accept(Register register) {
+			if(!register.has(name)) {
+				throw new RuntimeExecutionException(name + " is not defined");
+			} else {
+				if(VariableEvaluation.isAVariable(value, register)) {
+					if(!register.has(value)) {
+						throw new RuntimeExecutionException("Tried to set null variable!");
 					} else {
-						register.put(name, value);
+						register.put(name, register.get(value));
 					}
+				} else {
+					register.put(name, value);
 				}
 			}
+		}
 
-			@Override
-			public String toString() {
-				return "SetVariable(" + name + " to " + value + ")";
-			}
-		};
+		@Override
+		public final String describe() {
+			return "SetVariable(" + name + " to " + value + ")";
+		}
 	}
 
 	private String parseVariableValue(final Line input) {

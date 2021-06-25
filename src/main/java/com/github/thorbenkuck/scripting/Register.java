@@ -33,7 +33,7 @@ public class Register {
 	}
 
 	public boolean has(String key) {
-		return get(key).equals(NOT_KNOWN);
+		return core.containsKey(key);
 	}
 
 	public void remove(String name) {

@@ -13,4 +13,8 @@ public interface ScriptElement extends Serializable {
 	 * @param register the {@link Register} of the current script context.
 	 */
 	void accept(Register register);
+
+	default String describe() {
+		return toString();
+	}
 }

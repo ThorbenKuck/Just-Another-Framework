@@ -87,7 +87,7 @@ public class Script {
 		}
 
 		for(ScriptElement consumer : consumerCopy) {
-			result.append("(").append(lineCounter++).append("): ").append(consumer).append(System.lineSeparator());
+			result.append("(").append(lineCounter++).append("): ").append(consumer.describe()).append(System.lineSeparator());
 		}
 		result.append("------ SCRIPT_END");
 		return result.toString();

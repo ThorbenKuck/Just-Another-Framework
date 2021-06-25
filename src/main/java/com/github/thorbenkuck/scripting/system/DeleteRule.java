@@ -15,17 +15,26 @@ public class DeleteRule implements Rule {
 	@Override
 	public ScriptElement apply(Line line, Parser parser, int linePointer) {
 		String name = line.subPart(line.lastIndexOf(" ") + 1).toString();
-		return new ScriptElement() {
-			@Override
-			public void accept(Register register) {
-				// Blindly remove it
-				register.remove(name);
-			}
+		return new DeleteRuleScripElement(name);
+	}
 
-			@Override
-			public String toString() {
-				return "Delete " + name;
-			}
-		};
+	public static final class DeleteRuleScripElement implements ScriptElement {
+
+		private final String name;
+
+		public DeleteRuleScripElement(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public final void accept(Register register) {
+			// Blindly remove it
+			register.remove(name);
+		}
+
+		@Override
+		public final String describe() {
+			return "Delete " + name;
+		}
 	}
 }

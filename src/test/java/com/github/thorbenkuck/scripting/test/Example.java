@@ -41,21 +41,16 @@ public class Example {
 						"var y = x;" +
 						"require(y);" +
 						"loop i 1:5;" +
-						"    print(i);" +
-						"    print(\"=\");" +
-						"    println(y);" +
+						"    println(\"i=\", i);" +
 						"    loop j 1:3;" +
 						"        ++y;" +
 						"    endLoop j;" +
 						"endLoop i;" +
-						"print(\"x should still be what you selected: \");" +
-						"println(x);" +
-						"print(\"i=\");" +
-						"println(i);" +
-						"print(\"j=\");" +
-						"println(j);" +
+						"println(\"x should still be what you selected: \", x);" +
+						"println(\"i=\", i);" +
+						"println(\"j=\", j);" +
 						"var z;" +
-						"print(\"z=\");println(z);" +
+						"println(\"z=\", z);" +
 						"println(\"END\");";
 
 		// Creates a new Parser.

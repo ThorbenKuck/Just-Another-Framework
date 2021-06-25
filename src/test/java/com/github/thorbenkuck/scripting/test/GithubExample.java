@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class GithubExample {
 
@@ -31,6 +32,13 @@ public class GithubExample {
 
 		Parser parser = new Parser();
 
+		Consumer<Double> check = i -> {
+			Double remove = results.remove(0);
+			if(!remove.equals(i)) {
+				throw new IllegalStateException("Excepted " + i + " but got " + remove);
+			}
+		};
+
 		parser.add(new VariableInitializerRule());
 		parser.add(new VariableDefinitionRule());
 		parser.add(MathModule.getPackage());
@@ -39,14 +47,17 @@ public class GithubExample {
 		try {
 			Script script = parser.parse(rawScript);
 			script.run(Collections.singletonMap("x", "1"));
+			check.accept(27.0);
 			script.run(Collections.singletonMap("x", "2"));
+			check.accept(256.0);
 			script.run(Collections.singletonMap("x", "3"));
+			check.accept(3125.0);
 		} catch (ParsingFailedException | ExecutionFailedException e) {
-			e.printStackTrace();
+			throw new IllegalStateException(e);
 		}
 	}
 
-	private class ExportFunction implements Function {
+	private static class ExportFunction implements Function {
 
 		private final List<Double> results;
 
@@ -67,7 +78,6 @@ public class GithubExample {
 			String value = args[0];
 
 			results.add(toDouble(value, register));
-			System.out.println(results);
 
 			return NO_RETURN_VALUE;
 		}
