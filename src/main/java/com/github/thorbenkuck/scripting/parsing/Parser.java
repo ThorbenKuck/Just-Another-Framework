@@ -311,6 +311,9 @@ public class Parser {
 			ruleLock.lock();
 			while(lineParser.hasNext()) {
 				Line line = lineParser.getNext().duplicate();
+				if(line.isBlank()) {
+					continue;
+				}
 				try {
 					if(containsFunction(line.toString())) {
 						applyFunctions(line);

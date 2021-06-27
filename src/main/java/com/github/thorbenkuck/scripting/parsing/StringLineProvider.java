@@ -2,7 +2,6 @@ package com.github.thorbenkuck.scripting.parsing;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class StringLineProvider implements LineProvider {
@@ -24,6 +23,7 @@ public class StringLineProvider implements LineProvider {
 			int lineNumber = 0;
 			while (! complete.toString().isEmpty()) {
 				if(currentLine.isEmpty()) {
+					lines.add(Line.create("", lineNumber++));
 					continue;
 				}
 
@@ -39,9 +39,7 @@ public class StringLineProvider implements LineProvider {
 					complete.deleteCharAt(0);
 				}
 
-				if (! line.isEmpty()) {
-					lines.add(Line.create(line, lineNumber++));
-				}
+				lines.add(Line.create(line, lineNumber++));
 				complete.delete(0, line.length());
 			}
 		}
