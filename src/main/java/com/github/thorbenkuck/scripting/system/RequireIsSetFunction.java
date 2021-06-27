@@ -3,6 +3,7 @@ package com.github.thorbenkuck.scripting.system;
 import com.github.thorbenkuck.scripting.components.Function;
 import com.github.thorbenkuck.scripting.Register;
 import com.github.thorbenkuck.scripting.exceptions.RuntimeExecutionException;
+import com.github.thorbenkuck.scripting.parsing.Parser;
 
 public class RequireIsSetFunction implements Function {
 	@Override
@@ -18,6 +19,13 @@ public class RequireIsSetFunction implements Function {
 			}
 		}
 		return NO_RETURN_VALUE;
+	}
+
+	@Override
+	public void onParse(String[] args, Parser parser, int lineNumber) {
+		if(args.length == 0) {
+			parser.error("At least one variable must be provided", lineNumber);
+		}
 	}
 
 	@Override

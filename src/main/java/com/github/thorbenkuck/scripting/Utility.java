@@ -84,7 +84,7 @@ public class Utility {
 
 				@Override
 				public String toString() {
-					return "Set register " + registerAddress + " to " + function.getFunctionName() + "(" + Arrays.toString(args) + ")";
+					return function.getFunctionName() + "(" + Arrays.toString(args) + ") => " + registerAddress;
 				}
 			};
 		}

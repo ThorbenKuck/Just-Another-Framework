@@ -117,6 +117,7 @@ public class Parser {
 	private String evaluateFunction(String functionName, String[] args, int lineNumber) {
 		Function function = functions.get(functionName);
 		if (function == null) {
+			error("Unknown function " + functionName);
 			return "void";
 		}
 		function.onParse(args, this, lineNumber);
@@ -230,11 +231,11 @@ public class Parser {
 					foundLastClosingBracket = true;
 				}
 			} else if (currentChar == '(') {
-				// We found an function,
+				// We found a function,
 				// nested within the provided line
 				// now check, if we found a
 				// separate function or "only"
-				// another function as an parameter
+				// another function as a parameter
 				// to our function.
 				if (foundLastClosingBracket) {
 					return false;
@@ -247,7 +248,7 @@ public class Parser {
 				// is not an ' ', we should return
 				// false, because we found another
 				// char next to our function
-				// and the provided line therefor
+				// and the provided line there for
 				// is NO stand alone function
 				return false;
 			}
@@ -272,27 +273,6 @@ public class Parser {
 				error("To many closing bracket(s): " + -relation, line.getLineNumber());
 			}
 		}
-
-		// Here we should check
-		// for unknown functions,
-		// as well as unknown rules.
-		// The getUnknownFunctionNames
-		// and getUnknownNames methods
-		// are very tricky tho.. how
-		// should this be achieved?
-		// TODO
-//		for(Line line : lines) {
-//			List<String> unknownFunctionNames = getUnknownFunctionNames(lines);
-//			if(unknownFunctionNames.size() > 0) {
-//				error("Line contains undefined function(s): " + unknownFunctionNames, line.getLineNumber());
-//				return;
-//			}
-//			List<String> unknownOtherNames = getUnknownNames(lines);
-//			if(unknownOtherNames.size() > 0) {
-//				error("I do not understand: " + unknownOtherNames, line.getLineNumber());
-//				return;
-//			}
-//		}
 	}
 
 	private int relationOpenClosed(Line line) {
@@ -335,6 +315,7 @@ public class Parser {
 					if(containsFunction(line.toString())) {
 						applyFunctions(line);
 					}
+
 					applyRules(line, created);
 				} catch (Exception e) {
 					throw new ParsingFailedException("Encountered unexpected Exception while parsing!", e, lineParser.getLinePointer());

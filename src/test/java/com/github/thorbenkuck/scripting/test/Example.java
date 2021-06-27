@@ -76,8 +76,6 @@ public class Example {
 				.add(MathModule.getPackage())
 				.buildInMemory();
 
-		ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-
 		parser.add(foundation);
 
 		// Parse the Script.
